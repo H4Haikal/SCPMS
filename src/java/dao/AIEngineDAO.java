@@ -258,8 +258,9 @@ public class AIEngineDAO {
     // =========================================================================
     public String[] getDynamicAIFeedback(String title, String date, int duration, int pax, double budget, String budgetDetails, int heuristicScore) {
 
-        String geminiKey = "AQ.Ab8RN6IDNRE8pP2muwr1YbbXli2ClLXp72yA8j4mAe6ATVKT9A";
-        String openAIKey = "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";
+        // SAFELY CALLING FROM CONFIG.JAVA
+        String geminiKey = util.Config.GEMINI_API_KEY;
+        String openAIKey = util.Config.OPENAI_API_KEY;
 
         String prompt = "You are an official AI Advisor for university student clubs. "
                 + "Review this event proposal and provide a 3-sentence feedback summary. "

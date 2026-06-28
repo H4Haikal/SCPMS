@@ -9,10 +9,10 @@ import java.net.URL;
 
 public class GoogleMeetUtil {
 
-    // KUNCI BARU DARI GOOGLE CLOUD & PLAYGROUND (Telah disahkan berfungsi)
-    private static final String CLIENT_ID = "871264798352-4o8dt8eg0gkdp8jvlmarjfpid1aal6rb.apps.googleusercontent.com";
-    private static final String CLIENT_SECRET = "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";
-    private static final String REFRESH_TOKEN = "Insert Token Here";
+    // SAFELY CALLING FROM CONFIG.JAVA
+    private static final String CLIENT_ID = Config.GOOGLE_CLIENT_ID;
+    private static final String CLIENT_SECRET = Config.GOOGLE_CLIENT_SECRET;
+    private static final String REFRESH_TOKEN = Config.GOOGLE_REFRESH_TOKEN;
 
     private static String getFreshAccessToken() throws Exception {
         URL url = new URL("https://oauth2.googleapis.com/token");

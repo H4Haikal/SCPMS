@@ -6,9 +6,9 @@ import javax.mail.internet.*;
 
 public class EmailService {
 
-    // --- YOUR CREDENTIALS ---
-    private static final String SENDER_EMAIL = "clubsphere.umt2026@gmail.com";
-    private static final String SENDER_PASSWORD = "rpvgliwsyehohlyk";
+    // SAFELY CALLING FROM CONFIG.JAVA
+    private static final String SENDER_EMAIL = Config.EMAIL_SENDER;
+    private static final String SENDER_PASSWORD = Config.EMAIL_PASSWORD;
 
     // 1. Send Appointment Email (New Members/Committee)
     public static boolean sendPasswordEmail(String recipientEmail, String userName, String tempPassword, String role, String clubName) {

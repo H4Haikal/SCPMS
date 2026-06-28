@@ -1,0 +1,16 @@
+# Compiled class files
+*.class
+
+# NetBeans specific ignored files
+/build/
+/dist/
+/nbproject/private/
+
+# Mac/Windows system files
+.DS_Store
+Thumbs.db
+
+# ---------------------------------------------
+# SECRET FILES (We will create this next)
+# ---------------------------------------------
+src/util/Config.java
