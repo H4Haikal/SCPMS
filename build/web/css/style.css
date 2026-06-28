@@ -1,0 +1,262 @@
+/* UMT ClubSphere - Global Styles */
+/* Author: Haikal Danial Bin Mohd Rohaiza (S70622) */
+
+:root {
+    --umt-purple: #4B0082;
+    --umt-blue: #000080;
+    --umt-gold: #FFD700;
+    --sidebar-width: 280px; /* Centralized width variable */
+}
+
+html, body {
+    background-color: #f5f7ff;
+    font-family: 'Segoe UI', sans-serif;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* =========================================
+   SIDEBAR STYLES (Responsive Ready)
+   ========================================= */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: linear-gradient(180deg, #4B0082 0%, #000080 100%);
+    color: white;
+    box-shadow: 8px 0 20px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+
+    /* Smooth slide animation */
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.sidebar-header {
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding: 1.5rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.sidebar-header img {
+    filter: drop-shadow(0 0 8px white);
+}
+
+/* Scrollable Menu Area */
+.flex-grow-1.overflow-auto {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 10px;
+}
+
+/* Custom Scrollbar for Sidebar */
+.flex-grow-1.overflow-auto::-webkit-scrollbar {
+    width: 6px;
+}
+.flex-grow-1.overflow-auto::-webkit-scrollbar-track {
+    background: transparent;
+}
+.flex-grow-1.overflow-auto::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+}
+
+.sidebar-footer {
+    border-top: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.85rem;
+    background: rgba(0,0,0,0.2);
+    padding: 1rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Navigation Links */
+.nav-link {
+    color: rgba(255,255,255,0.85);
+    padding: 14px 20px;
+    border-radius: 10px;
+    margin: 6px 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    transform: translateX(8px);
+}
+
+.nav-link.active {
+    background: rgba(255,255,255,0.25);
+    color: white;
+    font-weight: 600;
+}
+
+.nav-link.text-danger:hover {
+    background: rgba(220,53,69,0.3);
+}
+
+/* =========================================
+   MAIN CONTENT AREA
+   ========================================= */
+.main-content {
+    margin-left: var(--sidebar-width); /* Matches sidebar width */
+    padding: 40px;
+    min-height: 100vh;
+
+    /* Smooth slide animation when sidebar toggles */
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid var(--umt-purple);
+}
+
+/* =========================================
+   DASHBOARD WIDGETS
+   ========================================= */
+.welcome-card {
+    background: linear-gradient(135deg, var(--umt-purple), var(--umt-blue));
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(75, 0, 130, 0.3);
+    margin-bottom: 40px;
+}
+
+.welcome-card h2 {
+    font-weight: 700;
+    font-size: 2.5rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: all 0.3s;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(75, 0, 130, 0.2);
+}
+
+.stat-card h3 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--umt-purple);
+    margin: 15px 0 10px;
+}
+
+.stat-card .icon {
+    font-size: 4rem;
+    opacity: 0.15;
+    margin-bottom: 15px;
+}
+
+.activity-box, .event-box {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    height: 100%;
+}
+
+.activity-item {
+    padding: 18px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.event-card {
+    background: #f8f9ff;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 6px solid var(--umt-purple);
+    margin-bottom: 20px;
+}
+
+.btn-view-all {
+    color: var(--umt-purple);
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.btn-view-all:hover {
+    text-decoration: underline;
+}
+
+/* =========================================
+   RESPONSIVE LOGIC (Mobile/Tablet)
+   ========================================= */
+@media (max-width: 992px) {
+
+    /* 1. HIDE SIDEBAR BY DEFAULT */
+    .sidebar {
+        margin-left: calc(var(--sidebar-width) * -1); /* Move it off-screen to the left */
+    }
+
+    /* 2. EXPAND CONTENT TO FULL WIDTH */
+    .main-content {
+        margin-left: 0;
+        padding: 20px; /* Reduce padding for smaller screens */
+    }
+
+    /* 3. SHOW SIDEBAR WHEN ACTIVE (Toggled by JS) */
+    .sidebar.active {
+        margin-left: 0; /* Slide it back in */
+        box-shadow: 5px 0 15px rgba(0,0,0,0.5); /* Stronger shadow to separate from content */
+    }
+
+    /* 4. DARKEN BACKGROUND OVERLAY */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999; /* Below sidebar (1000), above content */
+        top: 0;
+        left: 0;
+    }
+
+    .sidebar-overlay.active {
+        display: block; /* Show overlay when menu is open */
+    }
+
+    /* 5. ADJUST FONT SIZES FOR MOBILE */
+    .welcome-card h2 {
+        font-size: 1.8rem;
+    }
+
+    .stat-card h3 {
+        font-size: 2.5rem;
+    }
+}
+
+.sticky-ai-sidebar {
+    position: -webkit-sticky; /* Untuk Safari */
+    position: sticky;
+    top: 2rem; /* Jarak dari atas skrin bila dia mula melekat */
+    align-self: flex-start; /* Penting ni! */
+}
