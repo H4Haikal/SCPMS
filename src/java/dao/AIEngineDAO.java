@@ -337,6 +337,8 @@ public class AIEngineDAO {
             }
         } catch (Exception e) {
             System.out.println("Gemini attempt failed, falling back to OpenAI...");
+            System.err.println("DEBUG ERROR: " + e.getMessage());
+            e.printStackTrace();
         }
 
         // ---------------------------------------------------------
@@ -373,6 +375,8 @@ public class AIEngineDAO {
             }
         } catch (Exception e) {
             System.out.println("OpenAI attempt failed, utilizing Heuristic Fallback...");
+            System.err.println("DEBUG ERROR: " + e.getMessage());
+            e.printStackTrace();
         }
 
         // ---------------------------------------------------------
