@@ -13,4 +13,4 @@ Thumbs.db
 # ---------------------------------------------
 # SECRET FILES (We will create this next)
 # ---------------------------------------------
-src/util/Config.java
+src/java/util/Config.java
