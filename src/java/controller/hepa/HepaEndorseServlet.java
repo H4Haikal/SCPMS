@@ -2,9 +2,10 @@ package controller.hepa;
 
 import dao.ProposalDAO;
 import dao.NotificationDAO;
-import model.User;
+import dao.MasterCalendarDAO;
+import model.CalendarEvent;
+import model.EventItem;
 import java.io.IOException;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -13,6 +14,7 @@ import javax.servlet.http.*;
 public class HepaEndorseServlet extends HttpServlet {
 
     private final ProposalDAO dao = new ProposalDAO();
+    private final MasterCalendarDAO calendarDAO = new MasterCalendarDAO(); // Calendar DAO
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -31,11 +33,24 @@ public class HepaEndorseServlet extends HttpServlet {
         if ("approve".equals(action)) {
             dao.updateProposalStatus(proposalId, "Approved", "Final endorsement granted by HEPA.");
 
+            // --- SYNC WITH MASTER CALENDAR ---
+            EventItem p = dao.getProposalById3NF(proposalId);
+            if (p != null && p.getProposedDate() != null && p.getEndDate() != null) {
+                CalendarEvent event = new CalendarEvent();
+                event.setEventTitle(p.getTitle() + " (" + p.getClubName() + ")");
+                event.setStartDate(new java.sql.Date(p.getProposedDate().getTime()));
+                event.setEndDate(new java.sql.Date(p.getEndDate().getTime()));
+                event.setEventType("UMT Official"); // Enums allowed: Exam, Public Holiday, Convocation, UMT Official, Ramadan, Others
+                event.setDescription("Status: Approved. Organized by: " + p.getClubName());
+                calendarDAO.addEvent(event);
+            }
+            // ---------------------------------
+
             // Trigger Email & Loceng
             notifDAO.createNotificationWithRole(clubId, "Proposal Officially Endorsed!", "Congratulations! HEPA has officially endorsed your event proposal.", "STATUS", "/chc/events", "View Details", "CHC");
             notifDAO.createNotificationWithRole(clubId, "Proposal Endorsed", "HEPA has successfully endorsed a proposal you verified.", "STATUS", "/mpp/proposals", "View Record", "MPP");
 
-            request.getSession().setAttribute("successMessage", "Proposal officially endorsed!");
+            request.getSession().setAttribute("successMessage", "Proposal officially endorsed and added to Master Calendar!");
         } else if ("reject".equals(action)) {
             dao.updateProposalStatus(proposalId, "Rejected", "Rejected by HEPA.");
             notifDAO.createNotificationWithRole(clubId, "Proposal Rejected by HEPA", "Your proposal was rejected during final endorsement.", "WARNING", "/chc/events", "View Details", "CHC");

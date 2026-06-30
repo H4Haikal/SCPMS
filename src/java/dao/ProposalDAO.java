@@ -1572,4 +1572,53 @@ public class ProposalDAO {
         }
         return groupedDocs;
     }
+
+    // Method to add a new document to the database
+    // Added 'fileType' as the 6th parameter
+    public boolean insertSystemDocument(String category, String title, String filePath, String uploader, String fileSize, String fileType) {
+        String sql = "INSERT INTO system_documents (title, category, filePath, uploaded_by, fileSize, fileType) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, title);
+            ps.setString(2, category);
+            ps.setString(3, filePath);
+            ps.setString(4, uploader);
+            ps.setString(5, fileSize);
+            ps.setString(6, fileType); // Saves the file type!
+
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 1. Get the file path so we can physically delete the file from the server
+    public String getSystemDocumentPath(int docId) {
+        String path = null;
+        String sql = "SELECT filePath FROM system_documents WHERE docId = ?";
+        try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, docId);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    path = rs.getString("filePath");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return path;
+    }
+
+    // 2. Delete the record from the database
+    public boolean deleteSystemDocument(int docId) {
+        String sql = "DELETE FROM system_documents WHERE docId = ?";
+        try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, docId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

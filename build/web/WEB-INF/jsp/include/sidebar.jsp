@@ -58,8 +58,8 @@
                        href="${pageContext.request.contextPath}/mpp/agm">
                         <i class="fas fa-tasks me-3"></i> Semakan AGM
                     </a>
-                    <a class="nav-link <%= currentPath.contains("/mpp/calendar") ? "active" : ""%>" 
-                       href="${pageContext.request.contextPath}/mpp/calendar">
+                    <a class="nav-link <%= currentPath.contains("/common/calendar") ? "active" : ""%>" 
+                       href="${pageContext.request.contextPath}/common/calendar">
                         <i class="fas fa-calendar-day me-3"></i> Master Calendar
                     </a>
                     <a class="nav-link" href="#">
@@ -85,6 +85,10 @@
                        href="${pageContext.request.contextPath}/advisor/documentation">
                         <i class="fas fa-book me-3"></i> Documentations & Guidelines
                     </a>
+                    <a class="nav-link <%= currentPath.contains("/common/calendar") ? "active" : ""%>" 
+                       href="${pageContext.request.contextPath}/common/calendar">
+                        <i class="fas fa-calendar-day me-3"></i> Master Calendar
+                    </a>
                 </c:when>
 
                 <%-- HEPA MENU ITEMS --%>
@@ -103,14 +107,24 @@
                     </a>
                     <a class="nav-link <%= currentPath.contains("/hepa/agm") ? "active" : ""%>" 
                        href="${pageContext.request.contextPath}/hepa/agm">
-                        <i class="fas fa-clipboard-check me-3"></i> Pengurusan AGM
+                        <i class="fas fa-clipboard-check me-3"></i> Manage AGM
                     </a>
+
+                    <%-- NEW: HEPA DOCUMENT MANAGER --%>
+                    <a class="nav-link <%= currentPath.contains("/hepa/documents") ? "active" : ""%>" 
+                       href="${pageContext.request.contextPath}/hepa/documents">
+                        <i class="fas fa-file-upload me-3"></i> Manage Documents
+                    </a>
+
                     <a class="nav-link <%= currentPath.contains("/hepa/reports") ? "active" : ""%>" 
                        href="${pageContext.request.contextPath}/hepa/reports">
                         <i class="fas fa-chart-line me-3"></i> Master Reports
                     </a>
+                    <a class="nav-link <%= currentPath.contains("/common/calendar") ? "active" : ""%>" 
+                       href="${pageContext.request.contextPath}/common/calendar">
+                        <i class="fas fa-calendar-day me-3"></i> Master Calendar
+                    </a>
 
-                    <%-- NEW: HEPA AUDIT TRAIL LINK --%>
                     <a class="nav-link <%= currentPath.contains("/hepa/audit") ? "active" : ""%>" 
                        href="${pageContext.request.contextPath}/hepa/audit">
                         <i class="fas fa-fingerprint me-3"></i> Forensic Audit Trail
@@ -137,7 +151,18 @@
                     </a>
                     <a class="nav-link <%= currentPath.contains("/common/agm") ? "active" : ""%>" 
                        href="${pageContext.request.contextPath}/common/agm">
-                        <i class="fas fa-file-signature me-3"></i> Laporan AGM
+                        <i class="fas fa-file-signature me-3"></i> AGM Report
+                    </a>
+
+                    <%-- NEW: CHC GUIDELINES LINK --%>
+                    <a class="nav-link <%= currentPath.contains("/chc/documentation") ? "active" : ""%>" 
+                       href="${pageContext.request.contextPath}/chc/documentation">
+                        <i class="fas fa-book-open me-3"></i> Guidelines & Docs
+                    </a>
+
+                    <a class="nav-link <%= currentPath.contains("/common/calendar") ? "active" : ""%>" 
+                       href="${pageContext.request.contextPath}/common/calendar">
+                        <i class="fas fa-calendar-day me-3"></i> Master Calendar
                     </a>
                 </c:when>  
 
@@ -146,6 +171,10 @@
                     <a class="nav-link <%= currentPath.contains("/faculty/proposals") ? "active" : ""%>" 
                        href="${pageContext.request.contextPath}/faculty/proposals">
                         <i class="fas fa-folder-open me-3"></i> All Proposals
+                    </a>
+                    <a class="nav-link <%= currentPath.contains("/common/calendar") ? "active" : ""%>" 
+                       href="${pageContext.request.contextPath}/common/calendar">
+                        <i class="fas fa-calendar-day me-3"></i> Master Calendar
                     </a>
                 </c:when>
             </c:choose>

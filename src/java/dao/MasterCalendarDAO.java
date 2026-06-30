@@ -1,13 +1,19 @@
 package dao;
 
+import com.google.gson.Gson;
 import model.CalendarEvent;
 import util.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MasterCalendarDAO {
 
+    // ==========================================================
+    // EXISTING CRUD METHODS (Kept intact for MPP/HEPA functions)
+    // ==========================================================
     // 1. ADD EVENT
     public boolean addEvent(CalendarEvent event) {
         String sql = "INSERT INTO master_calendar (eventTitle, startDate, endDate, eventType, description) VALUES (?, ?, ?, ?, ?)";
@@ -24,7 +30,7 @@ public class MasterCalendarDAO {
         }
     }
 
-    // 2. GET ALL EVENTS
+    // 2. GET ALL EVENTS (Standard Java Objects)
     public List<CalendarEvent> getAllEvents() {
         List<CalendarEvent> events = new ArrayList<>();
         String sql = "SELECT * FROM master_calendar ORDER BY startDate ASC";
@@ -45,7 +51,7 @@ public class MasterCalendarDAO {
         return events;
     }
 
-    // 3. UPDATE EVENT (New)
+    // 3. UPDATE EVENT
     public boolean updateEvent(CalendarEvent event) {
         String sql = "UPDATE master_calendar SET eventTitle=?, startDate=?, endDate=?, eventType=?, description=? WHERE calendarId=?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -62,7 +68,7 @@ public class MasterCalendarDAO {
         }
     }
 
-    // 4. DELETE EVENT (New)
+    // 4. DELETE EVENT
     public boolean deleteEvent(int calendarId) {
         String sql = "DELETE FROM master_calendar WHERE calendarId=?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -89,5 +95,80 @@ public class MasterCalendarDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // ==========================================================
+    // NEW: UNIFIED JSON AGGREGATOR FOR THE UI
+    // ==========================================================
+    public String getAllCalendarEventsAsJson() {
+        List<Map<String, Object>> events = new ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection()) {
+
+            // A. FETCH MANUAL EVENTS & HOLIDAYS (From master_calendar table)
+            String sqlMaster = "SELECT calendarId, eventTitle, eventType, startDate, endDate, description FROM master_calendar";
+            try (PreparedStatement ps = conn.prepareStatement(sqlMaster); ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> event = new HashMap<>();
+                    event.put("id", "M_" + rs.getInt("calendarId"));
+                    event.put("title", rs.getString("eventTitle"));
+                    event.put("start", rs.getString("startDate"));
+                    event.put("end", rs.getString("endDate"));
+                    event.put("type", rs.getString("eventType"));
+                    event.put("desc", rs.getString("description"));
+                    event.put("editable", true);
+                    events.add(event);
+                }
+            }
+
+            // B. FETCH FULLY APPROVED CLUB EVENTS (Joined with Clubs table)
+            String sqlApproved = "SELECT p.proposalId, p.title, p.proposedDate AS startDate, p.endDate, c.clubName "
+                    + "FROM eventproposal p JOIN clubs c ON p.clubId = c.clubId "
+                    + "WHERE p.status = 'Approved'";
+            try (PreparedStatement ps = conn.prepareStatement(sqlApproved); ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> event = new HashMap<>();
+                    event.put("id", "P_" + rs.getInt("proposalId"));
+                    event.put("title", "✅ " + rs.getString("title"));
+                    event.put("start", rs.getString("startDate"));
+                    event.put("end", rs.getString("endDate"));
+                    event.put("type", "Approved");
+                    event.put("desc", "Official Club Program. Fully Endorsed.");
+                    event.put("clubName", rs.getString("clubName")); // NEW: Pass the club name
+                    event.put("editable", false);
+                    events.add(event);
+                }
+            }
+
+            // C. FETCH PITCHING SESSIONS (Joined with Clubs table)
+            String sqlMeet = "SELECT p.proposalId, p.title, p.pitchingDate, p.pitchingLocation, p.clubId, c.clubName "
+                    + "FROM eventproposal p JOIN clubs c ON p.clubId = c.clubId "
+                    + "WHERE p.pitchingLocation IS NOT NULL AND p.pitchingLocation != ''";
+            try (PreparedStatement ps = conn.prepareStatement(sqlMeet); ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> event = new HashMap<>();
+                    event.put("id", "G_" + rs.getInt("proposalId"));
+                    event.put("title", "🎥 Pitching: " + rs.getString("title"));
+
+                    String pDate = rs.getString("pitchingDate");
+                    if (pDate != null && pDate.length() >= 10) {
+                        event.put("start", pDate.substring(0, 10));
+                        event.put("end", pDate.substring(0, 10));
+                    }
+                    event.put("type", "Pitching");
+                    event.put("desc", "Official Pitching Session.");
+                    event.put("url", rs.getString("pitchingLocation"));
+                    event.put("clubId", rs.getInt("clubId")); // NEW: For security check
+                    event.put("clubName", rs.getString("clubName")); // NEW: For display
+                    event.put("editable", false);
+                    events.add(event);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new com.google.gson.Gson().toJson(events);
     }
 }

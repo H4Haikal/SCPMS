@@ -2,6 +2,7 @@ package controller.common;
 
 import dao.MasterCalendarDAO;
 import model.CalendarEvent;
+import model.User;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
@@ -14,11 +15,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Calendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-@WebServlet(name = "MasterCalendarServlet", urlPatterns = {"/mpp/calendar"})
+// Make sure it is routed to /common/calendar so all roles can access it
+@WebServlet(name = "MasterCalendarServlet", urlPatterns = {"/common/calendar"})
 public class MasterCalendarServlet extends HttpServlet {
 
     private MasterCalendarDAO calendarDAO = new MasterCalendarDAO();
@@ -27,29 +26,18 @@ public class MasterCalendarServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<CalendarEvent> events = calendarDAO.getAllEvents();
-
-        // Build JSON manually
-        StringBuilder json = new StringBuilder("[");
-        for (int i = 0; i < events.size(); i++) {
-            CalendarEvent e = events.get(i);
-            json.append("{")
-                    .append("\"id\": \"").append(e.getCalendarId()).append("\",")
-                    .append("\"title\": \"").append(escape(e.getEventTitle())).append("\",")
-                    .append("\"start\": \"").append(e.getStartDate().toString()).append("\",")
-                    .append("\"end\": \"").append(e.getEndDate().toString()).append("\",")
-                    .append("\"type\": \"").append(e.getEventType()).append("\",")
-                    .append("\"desc\": \"").append(escape(e.getDescription())).append("\"")
-                    .append("}");
-
-            if (i < events.size() - 1) {
-                json.append(",");
-            }
+        // 1. Security Check
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/LoginServlet");
+            return;
         }
-        json.append("]");
 
-        request.setAttribute("eventsJson", json.toString());
-        // Ensure this path matches where your JSP is located
+        // Use your brand new unified Gson method!
+        String eventsJson = calendarDAO.getAllCalendarEventsAsJson();
+
+        request.setAttribute("eventsJson", eventsJson);
+        // 3. Forward to the unified JSP
         request.getRequestDispatcher("/WEB-INF/jsp/common/MasterCalendar.jsp").forward(request, response);
     }
 
@@ -57,19 +45,27 @@ public class MasterCalendarServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Security Check - Only MPP or HEPA can make modifications!
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null || (!"MPP".equals(user.getRole()) && !"HEPA".equals(user.getRole()))) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Admins can modify the calendar.");
+            return;
+        }
+
         String action = request.getParameter("action");
 
         // --- 1. SYNC LOGIC (Fetch API) ---
         if ("sync".equals(action)) {
             syncPublicHolidays();
-            response.sendRedirect(request.getContextPath() + "/mpp/calendar?msg=synced");
+            response.sendRedirect(request.getContextPath() + "/common/calendar?msg=synced");
             return; // Stop here, don't run the rest
         }
 
         // --- 2. DELETE LOGIC ---
         if ("delete".equals(action)) {
             try {
-                int id = Integer.parseInt(request.getParameter("eventId"));
+                String rawId = request.getParameter("eventId").replace("M_", "");
+                int id = Integer.parseInt(rawId);
                 calendarDAO.deleteEvent(id);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
@@ -90,14 +86,16 @@ public class MasterCalendarServlet extends HttpServlet {
             event.setDescription(desc);
 
             if ("update".equals(action)) {
-                int id = Integer.parseInt(request.getParameter("eventId"));
+                String rawId = request.getParameter("eventId").replace("M_", "");
+                int id = Integer.parseInt(rawId);
                 event.setCalendarId(id);
                 calendarDAO.updateEvent(event);
             } else {
                 calendarDAO.addEvent(event);
             }
         }
-        response.sendRedirect(request.getContextPath() + "/mpp/calendar?msg=success");
+
+        response.sendRedirect(request.getContextPath() + "/common/calendar?msg=success");
     }
 
     // --- HYBRID SYNC: Try API -> Fallback to Manual Data ---
@@ -106,10 +104,7 @@ public class MasterCalendarServlet extends HttpServlet {
         boolean apiSuccess = false;
 
         try {
-            // 1. Try Fetching from API (Hardcoded to 2025 just to see if data exists, or keep dynamic)
-            // Note: We use 2025 here because 2026 might be empty in the API. 
-            // If you WANT 2026, we will rely on the fallback below.
-            int year = 2025;
+            int year = 2026;
             String urlString = "https://date.nager.at/api/v3/publicholidays/" + year + "/MY";
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -120,7 +115,7 @@ public class MasterCalendarServlet extends HttpServlet {
             System.out.println("API Response: " + responseCode);
 
             if (responseCode == 200) {
-                // ... (Parsing Logic) ...
+                apiSuccess = true;
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
                 StringBuilder jsonStr = new StringBuilder();
                 String line;
@@ -128,12 +123,7 @@ public class MasterCalendarServlet extends HttpServlet {
                     jsonStr.append(line);
                 }
                 br.close();
-
-                // If we got data, parse it (Reuse previous regex logic here if you want)
-                // For brevity, if 200 OK, we assume success.
-                // You can paste the Regex parsing block here from the previous step.
-                // ...
-                apiSuccess = true;
+                
             }
         } catch (Exception e) {
             System.out.println("API Failed. Switching to fallback.");

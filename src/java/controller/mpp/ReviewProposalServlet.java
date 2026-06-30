@@ -1,6 +1,9 @@
 package controller.mpp;
 
 import dao.ProposalDAO;
+import dao.MasterCalendarDAO;
+import model.CalendarEvent;
+import java.sql.Date;
 import model.User;
 import util.GoogleMeetUtil;
 import util.ProposalTracker;
@@ -51,7 +54,8 @@ public class ReviewProposalServlet extends HttpServlet {
         int proposalId = Integer.parseInt(request.getParameter("proposalId"));
 
         ProposalDAO dao = new ProposalDAO();
-        // SWAPPED TO 3NF
+        MasterCalendarDAO calendarDAO = new MasterCalendarDAO();
+
         model.EventItem p = dao.getProposalById3NF(proposalId);
         int clubId = p.getClubId();
         String pTitle = p.getTitle();
@@ -91,6 +95,20 @@ public class ReviewProposalServlet extends HttpServlet {
             if (meetingLink != null && !meetingLink.isEmpty()) {
                 if (dao.schedulePitching(proposalId, startTime, meetingLink)) {
                     ProposalTracker.logPitchingScheduled(user.getUserId(), proposalId, clubId, pTitle, startTime, meetingLink, null);
+
+                    // --- SYNC WITH MASTER CALENDAR ---
+                    if (startTime != null && startTime.length() >= 10) {
+                        String dateOnly = startTime.substring(0, 10);
+                        CalendarEvent event = new CalendarEvent();
+                        event.setEventTitle("Pitching: " + p.getClubName());
+                        event.setStartDate(Date.valueOf(dateOnly));
+                        event.setEndDate(Date.valueOf(dateOnly));
+                        event.setEventType("Others");
+                        event.setDescription("Proposal: " + pTitle + "\nMeet Link: " + meetingLink);
+                        calendarDAO.addEvent(event);
+                    }
+                    // ---------------------------------
+
                     request.getSession().setAttribute("successMessage", "Pitching set! Meeting link: " + meetingLink);
                 } else {
                     request.getSession().setAttribute("errorMessage", "Gagal kemas kini database.");
@@ -103,10 +121,10 @@ public class ReviewProposalServlet extends HttpServlet {
             // 2. ACTION: RESCHEDULE PITCHING
             // =============================================================
         } else if ("reschedule".equals(action)) {
-            // ... (Keep your existing reschedule logic exactly the same) ...
             String startTime = request.getParameter("startTime");
             String endTime = request.getParameter("endTime");
             String meetingLink = request.getParameter("meetingLink");
+
             try {
                 LocalDateTime parsedStart = LocalDateTime.parse(startTime);
                 if (parsedStart.isBefore(LocalDateTime.now())) {
@@ -119,6 +137,7 @@ public class ReviewProposalServlet extends HttpServlet {
                 }
             } catch (Exception e) {
             }
+
             if (meetingLink == null || meetingLink.trim().isEmpty()) {
                 try {
                     String formattedStart = startTime.length() == 16 ? startTime + ":00+08:00" : startTime + "+08:00";
@@ -127,9 +146,24 @@ public class ReviewProposalServlet extends HttpServlet {
                 } catch (Exception e) {
                 }
             }
+
             if (meetingLink != null && !meetingLink.isEmpty()) {
                 if (dao.schedulePitching(proposalId, startTime, meetingLink)) {
                     ProposalTracker.logPitchingScheduled(user.getUserId(), proposalId, clubId, pTitle, startTime, meetingLink, null);
+
+                    // --- SYNC WITH MASTER CALENDAR ---
+                    if (startTime != null && startTime.length() >= 10) {
+                        String dateOnly = startTime.substring(0, 10);
+                        CalendarEvent event = new CalendarEvent();
+                        event.setEventTitle("Pitching (Dikemaskini): " + p.getClubName());
+                        event.setStartDate(Date.valueOf(dateOnly));
+                        event.setEndDate(Date.valueOf(dateOnly));
+                        event.setEventType("Others");
+                        event.setDescription("Proposal: " + pTitle + "\nMeet Link: " + meetingLink);
+                        calendarDAO.addEvent(event);
+                    }
+                    // ---------------------------------
+
                     request.getSession().setAttribute("successMessage", "Tarikh pitching berjaya dikemaskini. Pautan baharu: " + meetingLink);
                 } else {
                     request.getSession().setAttribute("errorMessage", "Gagal kemas kini database.");
