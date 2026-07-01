@@ -169,7 +169,7 @@
                         <div class="col-md-4">
                             <select id="clusterFilter" class="form-select bg-light rounded-pill">
                                 <option value="all">All Clusters</option>
-                                <option value="Kelab Akademik">Kelab Akademik</option>
+                                <option value="Akademik">Kelab Akademik</option>
                                 <option value="Kelab Keusahawanan">Kelab Keusahawanan</option>
                                 <option value="Kelab Anak Negeri">Kelab Anak Negeri</option>
                                 <option value="Kelab Sukan">Kelab Sukan</option>
@@ -177,7 +177,7 @@
                                 <option value="Kelab Eksekutif">Kelab Eksekutif</option>
                                 <option value="Kelab Badan Beruniform">Kelab Badan Beruniform</option>
                                 <option value="Kelab Sosial">Kelab Sosial</option>
-                                <option value="Kelab Kerohanian">Kelab Kerohanian</option>
+                                <option value="Kerohanian">Kelab Kerohanian</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -339,7 +339,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold text-muted small">Cluster</label>
                                     <select name="cluster" class="form-select shadow-sm border-0" required>
-                                        <option value="Kelab Akademik">Kelab Akademik</option>
+                                        <option value="Akademik">Kelab Akademik</option>
                                         <option value="Kelab Keusahawanan">Kelab Keusahawanan</option>
                                         <option value="Kelab Anak Negeri">Kelab Anak Negeri</option>
                                         <option value="Kelab Sukan">Kelab Sukan</option>
@@ -347,7 +347,7 @@
                                         <option value="Kelab Eksekutif">Kelab Eksekutif</option>
                                         <option value="Kelab Badan Beruniform">Kelab Badan Beruniform</option>
                                         <option value="Kelab Sosial">Kelab Sosial</option>
-                                        <option value="Kelab Kerohanian">Kelab Kerohanian</option>
+                                        <option value="Kerohanian">Kelab Kerohanian</option>
                                     </select>
                                 </div>
                                 <div class="col-md-12">
@@ -435,7 +435,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold text-muted small">Cluster</label>
                                         <select name="cluster" class="form-select border-0 shadow-sm">
-                                            <option value="Kelab Akademik" ${club.cluster == 'Kelab Akademik' ? 'selected' : ''}>Kelab Akademik</option>
+                                            <option value="Akademik" ${club.cluster == 'Akademik' ? 'selected' : ''}>Kelab Akademik</option>
                                             <option value="Kelab Keusahawanan" ${club.cluster == 'Kelab Keusahawanan' ? 'selected' : ''}>Kelab Keusahawanan</option>
                                             <option value="Kelab Anak Negeri" ${club.cluster == 'Kelab Anak Negeri' ? 'selected' : ''}>Kelab Anak Negeri</option>
                                             <option value="Kelab Sukan" ${club.cluster == 'Kelab Sukan' ? 'selected' : ''}>Kelab Sukan</option>
@@ -443,7 +443,7 @@
                                             <option value="Kelab Eksekutif" ${club.cluster == 'Kelab Eksekutif' ? 'selected' : ''}>Kelab Eksekutif</option>
                                             <option value="Kelab Badan Beruniform" ${club.cluster == 'Kelab Badan Beruniform' ? 'selected' : ''}>Kelab Badan Beruniform</option>
                                             <option value="Kelab Sosial" ${club.cluster == 'Kelab Sosial' ? 'selected' : ''}>Kelab Sosial</option>
-                                            <option value="Kelab Kerohanian" ${club.cluster == 'Kelab Kerohanian' ? 'selected' : ''}>Kelab Kerohanian</option>
+                                            <option value="Kerohanian" ${club.cluster == 'Kerohanian' ? 'selected' : ''}>Kelab Kerohanian</option>
                                         </select>
                                     </div>
                                 </div>
@@ -520,7 +520,7 @@
 
         </c:forEach>
 
-        <%-- Modal Audit Student Membership (Request En Khalies) --%>
+        <%-- Modal Audit Student Membership  --%>
         <div class="modal fade" id="studentAuditModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content border-0 shadow-lg rounded-4">

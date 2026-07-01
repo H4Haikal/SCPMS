@@ -2,6 +2,7 @@ package controller.chc;
 
 import dao.ClubDashboardDAO;
 import dao.ClubMembershipDAO;
+import dao.NotificationDAO;
 import dao.ProposalDAO;
 import model.User;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.Notification;
 
 @WebServlet(name = "ClubDashboardServlet", urlPatterns = {"/ClubDashboardServlet"})
 public class ClubDashboardServlet extends HttpServlet {
@@ -37,10 +39,11 @@ public class ClubDashboardServlet extends HttpServlet {
 
         // --- MARK NOTIFICATIONS READ ---
         String action = request.getParameter("action");
-        if ("markRead".equals(action)) {
-            if (realClubId != -1) {
-                dao.markAllNotificationsAsRead(realClubId);
-            }
+        NotificationDAO notifDAO = new NotificationDAO();
+        String userId = user.getUserId();
+
+        if ("markRead".equals(action) || "markAllRead".equals(action)) {
+            notifDAO.markAllAsReadDynamic(realClubId, "CHC", userId);
             response.sendRedirect(request.getContextPath() + "/ClubDashboardServlet");
             return;
         }
@@ -52,8 +55,10 @@ public class ClubDashboardServlet extends HttpServlet {
         request.setAttribute("clubName", clubName);
 
         if (realClubId != -1) {
-            request.setAttribute("notifications", dao.getClubNotifications(realClubId));
-            request.setAttribute("notificationCount", dao.getUnreadNotificationCount(realClubId));
+            // Fetch notifications using NotificationDAO instead of ProposalDAO (dao)
+            List<Notification> notifications = notifDAO.getUnreadNotifications(realClubId, userId);
+            request.setAttribute("notifications", notifications);
+            request.setAttribute("notificationCount", notifications.size());
         }
 
         // --- 2. MEMBERSHIP STATS ---

@@ -28,8 +28,13 @@ public class AdvisorDashboardServlet extends HttpServlet {
 
         // --- TANGKAP ACTION MARK READ ---
         String action = request.getParameter("action");
-        if ("markRead".equals(action)) {
-            dao.markAllNotificationsAsReadForAdvisor(user.getUserId());
+        NotificationDAO notifDAO = new NotificationDAO();
+        String userId = user.getUserId();
+        int realClubIdForAdvisor = dao.getClubIdByAdvisorId(userId);
+
+// Capture Action Mark Read
+        if ("markRead".equals(action) || "markAllRead".equals(action)) {
+            notifDAO.markAllAsReadDynamic(realClubIdForAdvisor, "Advisor", userId);
             response.sendRedirect(request.getContextPath() + "/advisor/dashboard");
             return;
         }
@@ -37,11 +42,11 @@ public class AdvisorDashboardServlet extends HttpServlet {
         // --- TARIK DATA PROPOSAL PENDING ---
         request.setAttribute("pendingProposals", dao.getPendingProposalsForAdvisor(user.getUserId(), "submitted", "DESC"));
 
-        // --- TARIK DATA NOTIFIKASI (CLUB-SPECIFIC FIX) ---
-        int realClubIdForAdvisor = dao.getClubIdByAdvisorId(user.getUserId());
-        request.setAttribute("notifications", dao.getClubNotificationsForAdvisor(realClubIdForAdvisor));
-        request.setAttribute("notificationCount", dao.getUnreadNotificationCountForAdvisor(realClubIdForAdvisor));
-
+        // Fetch notifications using our user-isolated tracking table
+        List<Notification> notifications = notifDAO.getUnreadNotificationsForRole("Advisor", userId);
+        request.setAttribute("notifications", notifications);
+        request.setAttribute("notificationCount", notifications.size());
+        
         request.getRequestDispatcher("/WEB-INF/jsp/advisor/Dashboard.jsp").forward(request, response);
     }
 

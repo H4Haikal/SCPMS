@@ -67,16 +67,17 @@ public class HEPADashboardServlet extends HttpServlet {
         request.setAttribute("pendingProposals", pendingProposals);
 
         // Masukkan import dao.NotificationDAO; di bahagian atas fail
-        // 1. Panggil DAO Notifikasi
-        dao.NotificationDAO notifDao = new dao.NotificationDAO();
+        // 1. Initialize our modern notification tracker
+        dao.NotificationDAO notifDAO = new dao.NotificationDAO();
+        String userId = user.getUserId(); // Get the logged-in HEPA administrator's unique ID
 
-        // 2. Tarik notifikasi khas untuk role HEPA
-        List<model.Notification> hepaNotifs = notifDao.getUnreadNotificationsForRole("HEPA");
+// 2. Fetch user-isolated notifications directly from the case-insensitive role tracking table
+        java.util.List<model.Notification> notifications = notifDAO.getUnreadNotificationsForRole("HEPA", userId);
 
-        // 3. Hantar ke JSP (topbar.jsp guna variable ini)
-        request.setAttribute("notifications", hepaNotifs);
-        request.setAttribute("notificationCount", hepaNotifs.size());
-        
+// 3. Set attributes cleanly to perfectly match what your topbar dropdown template expects
+        request.setAttribute("notifications", notifications);
+        request.setAttribute("notificationCount", notifications.size());
+
         request.getRequestDispatcher("/WEB-INF/jsp/hepa/HEPADashboard.jsp").forward(request, response);
     }
 }

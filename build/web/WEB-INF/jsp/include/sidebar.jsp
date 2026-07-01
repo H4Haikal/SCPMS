@@ -56,15 +56,13 @@
                     </a>
                     <a class="nav-link <%= currentPath.contains("/mpp/agm") ? "active" : ""%>" 
                        href="${pageContext.request.contextPath}/mpp/agm">
-                        <i class="fas fa-tasks me-3"></i> Semakan AGM
+                        <i class="fas fa-tasks me-3"></i> Review AGM Report
                     </a>
                     <a class="nav-link <%= currentPath.contains("/common/calendar") ? "active" : ""%>" 
                        href="${pageContext.request.contextPath}/common/calendar">
                         <i class="fas fa-calendar-day me-3"></i> Master Calendar
                     </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-chart-bar me-3"></i> Reports & Analytics
-                    </a>
+                    
                     <a class="nav-link <%= currentPath.contains("/mpp/audit") ? "active" : ""%>" 
                        href="${pageContext.request.contextPath}/mpp/audit">
                         <i class="fas fa-history me-3"></i> Audit Trail
@@ -95,7 +93,7 @@
                 <c:when test="${sessionScope.role == 'HEPA' || sessionScope.user.role == 'HEPA'}">
                     <a class="nav-link <%= currentPath.contains("/hepa/club") ? "active" : ""%>" 
                        href="${pageContext.request.contextPath}/hepa/club">
-                        <i class="fas fa-heartbeat me-3"></i> Club Health
+                        <i class="fas fa-heartbeat me-3"></i> Manage Club
                     </a>
                     <a class="nav-link <%= currentPath.contains("/hepa/mpp") ? "active" : ""%>" 
                        href="${pageContext.request.contextPath}/hepa/mpp">

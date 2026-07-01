@@ -217,12 +217,28 @@
                                                     <i class="fas fa-file-pdf text-danger"></i>
                                                 </a>
 
-                                                <form action="${pageContext.request.contextPath}/faculty/review" method="POST" class="d-inline">
+                                                <form action="${pageContext.request.contextPath}/faculty/review" method="POST" class="d-inline-flex align-items-center">
+                                                    <!-- Hidden data parameters targeting the specific proposal ID row instance -->
                                                     <input type="hidden" name="proposalId" value="${p.proposalId}">
-                                                    <button type="submit" name="action" value="approve_hepa" class="btn btn-sm btn-faculty rounded-pill px-3 shadow-sm mx-1" onclick="return confirm('Verify academic content and forward to HEPA?');" data-bs-toggle="tooltip" title="Verify & Forward">
-                                                        <i class="fas fa-check-circle"></i> Verify
+                                                    <input type="hidden" name="source" value="dashboard">
+
+                                                    <!-- OPTION A BUTTON: Support & Forward to HEPA review pool pipeline -->
+                                                    <button type="submit" name="action" value="approve_hepa"
+                                                            class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm mx-1" 
+                                                            onclick="return confirm('Verify academic content and forward to HEPA for budget clearance?');" 
+                                                            data-bs-toggle="tooltip" title="Verify & Forward to HEPA">
+                                                        <i class="fas fa-paper-plane me-1"></i> Forward to HEPA
+                                                    </button>
+
+                                                    <!-- OPTION B BUTTON: Grant instant Full Final Approval bypassing alternative tracks -->
+                                                    <button type="submit" name="action" value="approve_final"
+                                                            class="btn btn-sm btn-faculty rounded-pill px-3 shadow-sm mx-1" 
+                                                            onclick="return confirm('Grant Full Final Approval immediately? This action completely bypasses HEPA and MPP review tracks.');" 
+                                                            data-bs-toggle="tooltip" title="Grant Full Approval Now">
+                                                        <i class="fas fa-check-double me-1"></i> Final Approve
                                                     </button>
                                                 </form>
+
 
                                                 <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#rejectModal${p.proposalId}" title="Return to Student">
                                                     <i class="fas fa-times-circle"></i> Reject
@@ -275,24 +291,24 @@
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
         <script>
-        $(document).ready(function () {
-            // Initialize DataTable with English Text
-            $('#facultyTable').DataTable({
-                "pageLength": 5,
-                "ordering": false,
-                "language": {
-                    "search": "Search Proposals:",
-                    "zeroRecords": "No pending proposals found.",
-                    "emptyTable": "You have no academic proposals waiting for verification at this time."
-                }
-            });
+                $(document).ready(function () {
+                    // Initialize DataTable with English Text
+                    $('#facultyTable').DataTable({
+                        "pageLength": 5,
+                        "ordering": false,
+                        "language": {
+                            "search": "Search Proposals:",
+                            "zeroRecords": "No pending proposals found.",
+                            "emptyTable": "You have no academic proposals waiting for verification at this time."
+                        }
+                    });
 
-            // Initialize Bootstrap Tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        });
+                    // Initialize Bootstrap Tooltips
+                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl);
+                    });
+                });
         </script>
     </body>
 </html>

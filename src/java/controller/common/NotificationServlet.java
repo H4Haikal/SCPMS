@@ -35,63 +35,50 @@ public class NotificationServlet extends HttpServlet {
 
         NotificationDAO notifDAO = new NotificationDAO();
         String role = user.getRole();
+        String userId = user.getUserId(); // Extracted from session context wrapper
 
-        // =======================================================
-        // CIRI BARU 1: KLIK NOTIFIKASI INDIVIDU (BUKA PAUTAN)
-        // =======================================================
+        // CIRI BARU 1: CLICK INDIVIDUAL NOTIFICATION
         if ("read".equals(action)) {
             try {
                 int notifId = Integer.parseInt(request.getParameter("id"));
                 String redirectUrl = request.getParameter("redirect");
 
-                // Kemas kini database (isRead = 1)
-                notifDAO.markAsRead(notifId);
+                // Isolate updates to only mark it read for this active user account context
+                notifDAO.markAsRead(notifId, userId);
 
-                // Bawa pengguna ke halaman sebenar berdasarkan Action Link
                 if (redirectUrl != null && !redirectUrl.trim().isEmpty() && !redirectUrl.equals("null")) {
-
-                    // --- MAGIK SAFETY CHECK DI SINI ---
-                    // Kalau link tu tak bermula dengan '/', kita letakkan '/' supaya tak jadi /scmscommon
                     if (!redirectUrl.startsWith("/")) {
                         redirectUrl = "/" + redirectUrl;
                     }
-
                     response.sendRedirect(request.getContextPath() + redirectUrl);
                     return;
                 }
             } catch (Exception e) {
                 System.err.println("Ralat klik notifikasi individu: " + e.getMessage());
             }
-
-            // Fallback kalau tak ada redirect url
             response.sendRedirect(referer != null ? referer : request.getContextPath());
             return;
         }
 
-        // =======================================================
-        // CIRI ASAL + BARU 2: TANDAKAN SEMUA SEBAGAI DIBACA
-        // =======================================================
+// CIRI BARU 2: MARK ALL AS READ
+        // Inside your NotificationServlet.java doGet method:
         if ("markAllRead".equals(action) || "/markNotificationsRead".equals(path)) {
-
-            int realClubId = -1; // Default
+            int realClubId = -1;
             ProposalDAO propDAO = new ProposalDAO();
 
-            // KEKALKAN CIRI ASAL: Cari clubId menggunakan ProposalDAO untuk role CHC
             if ("CHC".equals(role)) {
-                realClubId = propDAO.getClubIdByUserId(user.getUserId());
-
-                if (realClubId != -1) {
-                    // Panggil fungsi asal kau dalam ProposalDAO (Kekal tak diubah)
-                    propDAO.markAllNotificationsAsRead(realClubId);
-                }
+                realClubId = propDAO.getClubIdByUserId(userId);
+                // REMOVED: propDAO.markAllNotificationsAsRead(realClubId); 
+                // This old method is broken because it looks for the deleted 'isRead' column.
             }
 
-            // CIRI BARU: Panggil fungsi NotificationDAO untuk sokong Role lain (HEPA, MPP)
-            // Walaupun realClubId -1, fungsi ni tetap akan reset notifikasi ikut targetRole
-            notifDAO.markAllAsReadDynamic(realClubId, role);
+            // This method now handles EVERYTHING cleanly by inserting read states into 
+            // the user_notification_status table for this specific user ID!
+            notifDAO.markAllAsReadDynamic(realClubId, role, userId);
 
-            // Redirect balik ke tempat asal (Kekalkan ciri asal kau)
             response.sendRedirect(referer != null ? referer : request.getContextPath() + "/ClubDashboardServlet");
+            return; // Ensure execution stops here to avoid falling into other conditions
         }
+
     }
 }

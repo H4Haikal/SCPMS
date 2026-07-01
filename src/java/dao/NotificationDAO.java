@@ -122,20 +122,22 @@ public class NotificationDAO {
         }
     }
 
-    // 6. Fungsi Khas untuk Notifikasi Bersasar (Target Role)
+    // 6. Fungsi Khas untuk Notifikasi Bersasar (Target Role) - DIKEMAS KINI (Tanpa isRead)
     public boolean createNotificationWithRole(int clubId, String title, String message, String type, String link, String label, String targetRole) {
-        String sql = "INSERT INTO notifications (clubId, title, message, type, actionLink, actionLabel, isRead, targetRole) VALUES (?, ?, ?, ?, ?, ?, 0, ?)";
+        // KEMAS KINI: Buang 'isRead' dan nilai '0' daripada senarai INSERT
+        String sql = "INSERT INTO notifications (clubId, title, message, type, actionLink, actionLabel, targetRole) VALUES (?, ?, ?, ?, ?, ?, ?)";
         boolean isSuccess = false;
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            // Susunan parameter dikemaskini mengikut turutan tanda soal (?) baharu
             ps.setInt(1, clubId);
             ps.setString(2, title);
             ps.setString(3, message);
             ps.setString(4, type);
             ps.setString(5, link);
             ps.setString(6, label);
-            ps.setString(7, targetRole);
+            ps.setString(7, targetRole); // Kini menjadi parameter ke-7 secara tepat
 
             isSuccess = ps.executeUpdate() > 0;
 
@@ -274,4 +276,98 @@ public class NotificationDAO {
         }
         return list;
     }
+
+    // 1. Fetch unread notifications matching a user's Club ONLY (For CHC Role)
+    public List<Notification> getUnreadNotifications(int clubId, String userId) {
+        List<Notification> list = new ArrayList<>();
+        // CRITICAL FIX: Ensure targetRole is empty or null so administrative tasks do not leak here
+        String sql = "SELECT n.* FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.clubId = ? AND (n.targetRole IS NULL OR n.targetRole = '' OR n.targetRole = 'CHC') AND uns.notificationId IS NULL "
+                + "ORDER BY n.createdAt DESC";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, userId);
+            ps.setInt(2, clubId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Notification n = mapNotification(rs);
+                    list.add(n);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+// Fetch unread notifications matching a generic administrative role (Case-Insensitive Fix)
+    public List<Notification> getUnreadNotificationsForRole(String role, String userId) {
+        List<Notification> list = new ArrayList<>();
+
+        // FIX: Wrap n.targetRole and our parameter placeholder inside LOWER() to ignore text casing errors
+        String sql = "SELECT n.* FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE LOWER(n.targetRole) = LOWER(?) AND uns.notificationId IS NULL "
+                + "ORDER BY n.createdAt DESC";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, userId);
+            ps.setString(2, role); // Takes care of "Faculty", "faculty", "FACULTY" seamlessly
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Notification n = mapNotification(rs);
+                    list.add(n);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+// 3. Mark all targeted alerts as read dynamically without corrupting other accounts
+    public boolean markAllAsReadDynamic(int clubId, String role, String userId) {
+        String sql = "INSERT INTO user_notification_status (notificationId, userId) "
+                + "SELECT notificationId, ? FROM notifications "
+                + "WHERE (clubId = ? AND clubId != 0) OR targetRole = ? "
+                + "ON DUPLICATE KEY UPDATE isRead = 1";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, userId);
+            ps.setInt(2, clubId);
+            ps.setString(3, role);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+// 4. Mark a singular notification as read when individually clicked
+    public boolean markAsRead(int notificationId, String userId) {
+        String sql = "INSERT INTO user_notification_status (notificationId, userId) VALUES (?, ?) "
+                + "ON DUPLICATE KEY UPDATE isRead = 1";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, notificationId);
+            ps.setString(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+//    -- Reusable Private Helper method to keep code DRY
+    private Notification mapNotification(ResultSet rs) throws SQLException {
+        Notification n = new Notification();
+        n.setNotificationId(rs.getInt("notificationId"));
+        n.setTitle(rs.getString("title"));
+        n.setMessage(rs.getString("message"));
+        n.setType(rs.getString("type"));
+        n.setActionLink(rs.getString("actionLink"));
+        n.setActionLabel(rs.getString("actionLabel"));
+        n.setCreatedAt(rs.getTimestamp("createdAt"));
+        return n;
+    }
+
 }

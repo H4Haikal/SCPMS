@@ -353,4 +353,33 @@ public class UserDAO {
         }
     }
 
+    public model.User getUserById(String userId) {
+        // Selects the phone and full name fields needed for the signature block
+        String sql = "SELECT userId, fullName, email, role, department, isActive, phone, portfolio FROM user WHERE userId = ?";
+
+        // Replace with your project's actual database connection manager class
+        try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
+
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    model.User u = new model.User();
+                    u.setUserId(rs.getString("userId"));
+                    u.setFullName(rs.getString("fullName"));
+                    u.setEmail(rs.getString("email"));
+                    u.setRole(rs.getString("role"));
+                    u.setDepartment(rs.getString("department"));
+                    u.setActive(rs.getBoolean("isActive"));
+                    u.setPhone(rs.getString("phone"));
+                    u.setPortfolio(rs.getString("portfolio"));
+                    return u;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null; // Returns null if user is not found in the DB
+    }
+
 }

@@ -29,13 +29,23 @@ public class AdvisorPendingServlet extends HttpServlet {
         List<Map<String, Object>> proposals = dao.getAllProposalsForAdvisor(user.getUserId());
         request.setAttribute("proposals", proposals);
 
+        String action = request.getParameter("action");
         NotificationDAO notifDAO = new NotificationDAO();
-        List<Notification> notifications = notifDAO.getUnreadNotificationsForRole("Advisor");
-        // --- TARIK DATA NOTIFIKASI (CLUB-SPECIFIC FIX) ---
-        int realClubIdForAdvisor = dao.getClubIdByAdvisorId(user.getUserId());
-        request.setAttribute("notifications", dao.getClubNotificationsForAdvisor(realClubIdForAdvisor));
-        request.setAttribute("notificationCount", dao.getUnreadNotificationCountForAdvisor(realClubIdForAdvisor));
-        
+        String userId = user.getUserId();
+        int realClubIdForAdvisor = dao.getClubIdByAdvisorId(userId);
+
+// Capture Action Mark Read
+        if ("markRead".equals(action) || "markAllRead".equals(action)) {
+            notifDAO.markAllAsReadDynamic(realClubIdForAdvisor, "Advisor", userId);
+            response.sendRedirect(request.getContextPath() + "/advisor/dashboard");
+            return;
+        }
+
+// Fetch notifications using our user-isolated tracking table
+        List<Notification> notifications = notifDAO.getUnreadNotificationsForRole("Advisor", userId);
+        request.setAttribute("notifications", notifications);
+        request.setAttribute("notificationCount", notifications.size());
+
         request.getRequestDispatcher("/WEB-INF/jsp/advisor/PendingProposals.jsp").forward(request, response);
     }
 

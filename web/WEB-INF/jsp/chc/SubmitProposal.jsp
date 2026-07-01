@@ -247,11 +247,41 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold text-secondary">Sponsorship & External Funding <span class="text-muted fw-normal">(Optional)</span></label>
-                                    <textarea name="budgetDetails" class="form-control bg-light border-0 shadow-none" rows="2" placeholder="E.g., Tajaan syarikat luar RM 500, Kutipan yuran peserta RM 10...">${draft.budgetDetails}</textarea>
-                                    <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Declaring sponsorships will reduce AI risk penalties if your program exceeds the annual budget.</small>
+                                <%-- NEW: STRUCTURED FINANCING SOURCE FIELDS --%>
+                                <div class="mb-4 p-3 border rounded-3 bg-light">
+                                    <label class="form-label fw-bold text-secondary mb-2">Alternative/External Sources of Revenue</label>
+                                    <p class="small text-muted mb-3">Please fill out any additional revenue channels applicable to this event (Leave 0 if none).</p>
+
+                                    <div class="row g-3">
+                                        <!-- 1. Participant Fees -->
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Yuran Peserta Total (RM)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-end-0">RM</span>
+                                                <input type="number" step="0.01" name="budgetYuran" class="form-control border-start-0" value="0.00" min="0">
+                                            </div>
+                                        </div>
+
+                                        <!-- 2. University/PTj Contributions -->
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Sumbangan PTj/Universiti (RM)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-end-0">RM</span>
+                                                <input type="number" step="0.01" name="budgetPtj" class="form-control border-start-0" value="0.00" min="0">
+                                            </div>
+                                        </div>
+
+                                        <!-- 3. External Sponsors -->
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Sumbangan Luar/Penaja (RM)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-end-0">RM</span>
+                                                <input type="number" step="0.01" name="budgetLuar" class="form-control border-start-0" value="0.00" min="0">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+
 
                                 <div class="form-section-title mt-5">
                                     <i class="fas fa-file-pdf me-2"></i>Part B: Official Document Details

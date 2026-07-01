@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Jun 22, 2026 at 07:25 AM
+-- Generation Time: Jun 30, 2026 at 10:26 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -276,7 +276,10 @@ INSERT INTO `audit_logs` (`logId`, `userId`, `proposalId`, `Action`, `Descriptio
 (207, 'S70622', 93, 'Proposal Submitted', 'Draft finalized and submitted to Club Advisor.', NULL, '2026-06-21 21:50:36'),
 (208, 'S70622', 94, 'Proposal Submitted', 'Draft finalized and submitted to Club Advisor.', NULL, '2026-06-21 22:14:14'),
 (209, 'S70622', 91, 'Proposal Submitted', 'Draft finalized and submitted to Club Advisor.', NULL, '2026-06-21 22:21:09'),
-(210, 'S70622', 66, 'Proposal Submitted', 'Draft finalized and submitted to Club Advisor.', NULL, '2026-06-21 22:40:45');
+(210, 'S70622', 66, 'Proposal Submitted', 'Draft finalized and submitted to Club Advisor.', NULL, '2026-06-21 22:40:45'),
+(211, 'MPP001', 79, 'Pitching Scheduled', 'Meeting set for 2026-06-30 15:30.', NULL, '2026-06-28 07:31:11'),
+(212, 'S70622', 97, 'Proposal Submitted', 'Draft finalized and submitted to Club Advisor.', NULL, '2026-06-28 07:56:42'),
+(213, 'HEPA001', 39, 'Approved by HEPA', 'Tahniah! HEPA telah meluluskan kertas kerja ini secara rasmi.', NULL, '2026-06-30 07:48:44');
 
 -- --------------------------------------------------------
 
@@ -447,7 +450,7 @@ INSERT INTO `eventproposal` (`proposalId`, `clubId`, `proposalType`, `createdBy`
 (36, 1002, 'Event', 'S70622', 'TestMeeting3', 'test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-20', NULL, 1, 0, 0, 0, NULL, 2222, 111.00, 0, 'Draft', 0, NULL, '2026-04-19 17:53:22', '2026-04-25 04:53:29', 'Rejected by MPP: Change date', 'Masjid UMT', 'Warga Tok Jembal', NULL, NULL, 0, NULL, 1, NULL),
 (37, 1002, 'Event', 'S70622', 'TestProp1', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-20', NULL, 2, 0, 0, 0, NULL, 22, 222.00, 0, 'Meeting_Scheduled', 0, NULL, '2026-04-19 17:58:57', '2026-04-19 18:00:41', 'PITCHING SCHEDULED\nDate: 2026-04-23\nTime: 21:00\nLink: https://meet.google.com/abc-defg-hij', 'Masjid UMT', 'Warga Tok Jembal', NULL, NULL, 0, NULL, 1, NULL),
 (38, 1002, 'Event', 'S70622', 'TestHepa1', 'test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-05-09', NULL, 2, 0, 0, 0, NULL, 150, 1500.00, 0, 'Approved', 0, NULL, '2026-04-19 18:35:55', '2026-04-19 18:44:49', 'Final endorsement granted by HEPA. Congratulations.', 'Masjid UMT', 'Warga Tok Jembal', NULL, NULL, 0, NULL, 1, NULL),
-(39, 1001, 'Event', 'S70810', 'Bengkel C#', 'bengkel', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-05-02', NULL, 1, 0, 0, 0, NULL, 25, 10.00, 1, 'Pending_HEPA', 0, NULL, '2026-04-19 19:50:20', '2026-06-05 14:00:44', 'Altered by HEPA: aaa', 'Makmal Pengaturcaraan 1, FSKM, UMT', 'FSKM Students', NULL, NULL, 0, NULL, 1, NULL),
+(39, 1001, 'Event', 'S70810', 'Bengkel C#', 'bengkel', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-05-02', NULL, 1, 0, 0, 0, NULL, 25, 10.00, 1, 'Approved', 0, NULL, '2026-04-19 19:50:20', '2026-06-30 07:48:44', 'Official HEPA Approval Granted.', 'Makmal Pengaturcaraan 1, FSKM, UMT', 'FSKM Students', NULL, NULL, 0, NULL, 1, NULL),
 (40, 1001, 'Event', 'S70810', 'Bengkel Database', 'database class with Dr Faizah Aplop', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-05-09', NULL, 1, 0, 0, 0, NULL, 20, 250.00, 0, 'Rejected', 0, NULL, '2026-04-19 19:53:49', '2026-04-20 00:58:22', 'Faculty has rejected the proposal', 'Makmal Pengaturcaraan 1, FSKM, UMT', 'FSKM Students', NULL, NULL, 0, NULL, 1, NULL),
 (41, 1001, 'Event', 'S70810', 'Bengkel Web Design', 'bengkel web design menggunakan Figma', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-29', NULL, 1, 0, 0, 0, NULL, 20, 300.00, 0, 'Approved', 0, NULL, '2026-04-19 21:12:01', '2026-04-19 21:44:08', 'Final endorsement granted by HEPA.', 'Makmal Pengaturcaraan 1, FSKM, UMT', 'FSKM Students', NULL, NULL, 0, NULL, 1, NULL),
 (42, 1001, 'Event', 'S70810', 'Test1', 'Test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-20', NULL, 2, 0, 0, 0, NULL, 22, 22.00, 0, 'Approved', 0, NULL, '2026-04-19 21:34:14', '2026-04-19 21:44:06', 'Final endorsement granted by HEPA.', 'Makmal Pengaturcaraan 1, FSKM, UMT', 'FSKM Students', NULL, NULL, 0, NULL, 1, NULL),
@@ -487,7 +490,7 @@ INSERT INTO `eventproposal` (`proposalId`, `clubId`, `proposalType`, `createdBy`
 (76, 1002, 'Event', 'S70622', 'TestNormalizedTable', 'TestNormalizedTable', 'TestNormalizedTable\r\nTestNormalizedTable\r\nTestNormalizedTable', 'SDG 4: Quality Education | SDG 5: Gender Equality', 'SDG 4: Quality Education ^ TestNormalizedTable ||| SDG 5: Gender Equality ^ TestNormalizedTable', NULL, NULL, NULL, NULL, '2026-06-09', '2026-06-09', 1, 11, 1, 0, '', 12, 20.00, 0, 'Draft', 0, NULL, '2026-06-09 14:47:26', '2026-06-09 17:02:11', NULL, 'Masjid UMT', 'Warga UMT', NULL, NULL, 0, NULL, 1, NULL),
 (77, 1002, 'Event', 'S70622', 'EventTestNormalizedV1', 'EventTestNormalizedV1', 'EventTestNormalizedV1\r\nEventTestNormalizedV1\r\nEventTestNormalizedV1', 'SDG 1: No Poverty | SDG 2: Zero Hunger', 'SDG 1: No Poverty ^ EventTestNormalizedV1 ||| SDG 2: Zero Hunger ^ EventTestNormalizedV1', NULL, NULL, NULL, NULL, '2026-06-17', '2026-06-17', 1, 11, 0, 0, '', 11, 1220.00, 0, 'Pending_Advisor', 130, NULL, '2026-06-17 04:40:28', '2026-06-17 04:43:34', NULL, 'Masjid UMT', 'Warga UMT', NULL, NULL, 0, NULL, 1, NULL),
 (78, 1002, 'Event', 'S70622', 'EventTestNormalizedV2', 'EventTestNormalizedV2', 'EventTestNormalizedV2', 'SDG 1: No Poverty', '', NULL, NULL, NULL, NULL, '2026-07-10', '2026-07-10', 0, 11, 1, 0, '', 0, 0.00, 0, 'Draft', 0, '', '2026-06-17 07:25:31', '2026-06-17 07:25:31', NULL, 'Masjid UMT', 'Warga UMT', NULL, NULL, 0, NULL, 1, NULL),
-(79, 1002, 'Event', 'S70622', 'EventTestNormalizedV3', 'EventTestNormalizedV3', 'EventTestNormalizedV3\r\nEventTestNormalizedV3\r\nEventTestNormalizedV3', 'SDG 1: No Poverty', 'SDG 1: No Poverty ^ EventTestNormalizedV3', NULL, 'uploads/erisk/PROPOSAL_79_ERISK_Cyber_Security_-_G11__Mobile_Application_Security_and_Privacy_Risks.pdf', NULL, NULL, '2026-07-10', '2026-07-10', 1, 11, 0, 0, '', 11, 20.00, 0, 'Meeting_Scheduled', 100, '<ul class=\'mb-3\' style=\'line-height: 1.8;\'><li class=\'text-warning text-dark\'><b>Doubtful Financials (Too Low):</b> Average cost is unrealistic (RM0.91/participant).</li><li class=\'text-success\'><b>Controlled Logistics:</b> Daily participant capacity is well managed.</li><li class=\'text-success\'><b>Ideal Timing Planning:</b> No clashes with major University events.</li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>Overall Risk Index:</h6><div><span class=\'badge bg-warning text-dark fs-6 shadow-sm\'><i class=\'fas fa-exclamation-triangle me-1\'></i> MODERATE (46%)</span></div></div><div class=\'mt-2 p-2 bg-warning bg-opacity-10 rounded border border-warning\'><small class=\'text-warning-emphasis fw-bold\'>AI Judgement:</small> <small class=\'text-dark\'>PROCEED WITH CAUTION. Close monitoring is required before endorsement.</small></div>', '2026-06-17 23:48:27', '2026-06-18 06:39:16', 'PITCHING SCHEDULED.\nTarikh & Masa: 2026-06-23 14:38:00\nLink/Lokasi: https://meet.google.com/fqd-niae-avg', 'Masjid UMT', 'Warga UMT', '2026-06-23 14:38:00', 'https://meet.google.com/fqd-niae-avg', 1, NULL, 1, NULL),
+(79, 1002, 'Event', 'S70622', 'EventTestNormalizedV3', 'EventTestNormalizedV3', 'EventTestNormalizedV3\r\nEventTestNormalizedV3\r\nEventTestNormalizedV3', 'SDG 1: No Poverty', 'SDG 1: No Poverty ^ EventTestNormalizedV3', NULL, 'uploads/erisk/PROPOSAL_79_ERISK_Cyber_Security_-_G11__Mobile_Application_Security_and_Privacy_Risks.pdf', NULL, NULL, '2026-07-10', '2026-07-10', 1, 11, 0, 0, '', 11, 20.00, 0, 'Meeting_Scheduled', 100, '<ul class=\'mb-3\' style=\'line-height: 1.8;\'><li class=\'text-warning text-dark\'><b>Doubtful Financials (Too Low):</b> Average cost is unrealistic (RM0.91/participant).</li><li class=\'text-success\'><b>Controlled Logistics:</b> Daily participant capacity is well managed.</li><li class=\'text-success\'><b>Ideal Timing Planning:</b> No clashes with major University events.</li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>Overall Risk Index:</h6><div><span class=\'badge bg-warning text-dark fs-6 shadow-sm\'><i class=\'fas fa-exclamation-triangle me-1\'></i> MODERATE (46%)</span></div></div><div class=\'mt-2 p-2 bg-warning bg-opacity-10 rounded border border-warning\'><small class=\'text-warning-emphasis fw-bold\'>AI Judgement:</small> <small class=\'text-dark\'>PROCEED WITH CAUTION. Close monitoring is required before endorsement.</small></div>', '2026-06-17 23:48:27', '2026-06-28 07:31:11', 'PITCHING SCHEDULED.\nTarikh & Masa: 2026-06-30 15:30:00\nLink/Lokasi: https://meet.google.com/wzn-ifpa-vap', 'Masjid UMT', 'Warga UMT', '2026-06-30 15:30:00', 'https://meet.google.com/wzn-ifpa-vap', 1, NULL, 1, NULL),
 (80, 1001, 'Event', 'S72421', 'EventTestNormalizedV4', 'EventTestNormalizedV4', 'EventTestNormalizedV4\r\nEventTestNormalizedV4', 'SDG 6: Clean Water & Sanitation | SDG 14: Life Below Water', 'SDG 6: Clean Water & Sanitation ^ EventTestNormalizedV4 ||| SDG 14: Life Below Water ^ EventTestNormalizedV4', NULL, 'uploads/erisk/PROPOSAL_80_ERISK_Cyber_Security_-_G11__Mobile_Application_Security_and_Privacy_Risks__2_.pdf', 'uploads/mpp_minutes/PROPOSAL_80_MINUTES_Cyber_Security_-_G11__Mobile_Application_Security_and_Privacy_Risks__1_.pdf', NULL, '2026-06-19', '2026-06-19', 1, 111, 0, 0, '', 111, 60.00, 0, 'Approved', 130, '<ul class=\'mb-3\' style=\'line-height: 1.8;\'><li class=\'text-warning text-dark\'><b>Doubtful Financials (Too Low):</b> Average cost is unrealistic (RM0.09/participant).</li><li class=\'text-success\'><b>Controlled Logistics:</b> Daily participant capacity is well managed.</li><li class=\'text-danger\'><b>Timing Warning:</b> Proposed date is too URGENT (less than 2 weeks from today).</li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>Overall Risk Index:</h6><div><span class=\'badge bg-warning text-dark fs-6 shadow-sm\'><i class=\'fas fa-exclamation-triangle me-1\'></i> MODERATE (54%)</span></div></div><div class=\'mt-2 p-2 bg-warning bg-opacity-10 rounded border border-warning\'><small class=\'text-warning-emphasis fw-bold\'>AI Judgement:</small> <small class=\'text-dark\'>PROCEED WITH CAUTION. Close monitoring is required before endorsement.</small></div>', '2026-06-18 02:20:22', '2026-06-18 02:52:59', 'Official HEPA Approval Granted.', 'Makmal Pengaturcaraan 1, FSKM, UMT', 'FSKM Students', NULL, NULL, 1, NULL, 1, NULL),
 (81, 1001, 'Event', 'S72421', 'EventTestNormalizedV5', 'EventTestNormalizedV5', 'EventTestNormalizedV5\r\nEventTestNormalizedV5\'EventTestNormalizedV5\r\nEventTestNormalizedV5', 'SDG 2: Zero Hunger', 'SDG 2: Zero Hunger ^ EventTestNormalizedV5', NULL, 'uploads/erisk/PROPOSAL_81_ERISK_Cyber_Security_-_G11__Mobile_Application_Security_and_Privacy_Risks__1_.pdf', NULL, NULL, '2026-07-01', '2026-07-01', 1, 11, 11, 11, 'University Representative', 33, 50.00, 0, 'Approved', 130, '<ul class=\'mb-3\' style=\'line-height: 1.8;\'><li class=\'text-success\'><b>Efficient Financials:</b> Optimum spending (RM3.33/participant).</li><li class=\'text-success\'><b>Controlled Logistics:</b> Daily participant capacity is well managed.</li><li class=\'text-danger\'><b>Timing Warning:</b> Proposed date is too URGENT (less than 2 weeks from today).</li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>Overall Risk Index:</h6><div><span class=\'badge bg-success fs-6 shadow-sm\'><i class=\'fas fa-check-circle me-1\'></i> OPTIMUM (31%)</span></div></div><div class=\'mt-2 p-2 bg-success bg-opacity-10 rounded border border-success\'><small class=\'text-success fw-bold\'>AI Judgement:</small> <small class=\'text-dark\'>HIGHLY RECOMMENDED. Clear calendar, solid planning, and budget meets specifications.</small></div>', '2026-06-18 02:29:22', '2026-06-18 02:32:27', 'Diluluskan sepenuhnya oleh Fakulti.', 'Masjid UMT', 'FSKM Students', NULL, NULL, 1, NULL, 1, NULL),
 (82, 1001, 'Event', 'S72421', 'EventTestNormalizedV6', 'EventTestNormalizedV6', 'EventTestNormalizedV6\r\nEventTestNormalizedV6', 'SDG 1: No Poverty', 'SDG 1: No Poverty ^ EventTestNormalizedV6', NULL, 'uploads/erisk/PROPOSAL_82_ERISK_Cyber_Security_-_G11__Mobile_Application_Security_and_Privacy_Risks__1_.pdf', NULL, NULL, '2026-06-18', '2026-06-18', 1, 11, 11, 11, 'University Representative', 33, 140.00, 0, 'Approved', 130, '<ul class=\'mb-3\' style=\'line-height: 1.8;\'><li class=\'text-warning text-dark\'><b>Doubtful Financials (Too Low):</b> Average cost is unrealistic (RM0.30/participant).</li><li class=\'text-success\'><b>Controlled Logistics:</b> Daily participant capacity is well managed.</li><li class=\'text-danger\'><b>Timing Warning:</b> Proposed date is too URGENT (less than 2 weeks from today).</li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>Overall Risk Index:</h6><div><span class=\'badge bg-warning text-dark fs-6 shadow-sm\'><i class=\'fas fa-exclamation-triangle me-1\'></i> MODERATE (54%)</span></div></div><div class=\'mt-2 p-2 bg-warning bg-opacity-10 rounded border border-warning\'><small class=\'text-warning-emphasis fw-bold\'>AI Judgement:</small> <small class=\'text-dark\'>PROCEED WITH CAUTION. Close monitoring is required before endorsement.</small></div>', '2026-06-18 02:54:53', '2026-06-18 03:00:35', 'Official HEPA Approval Granted.', 'Masjid UMT', 'FSKM Students', NULL, NULL, 1, NULL, 1, NULL),
@@ -503,8 +506,10 @@ INSERT INTO `eventproposal` (`proposalId`, `clubId`, `proposalType`, `createdBy`
 (91, 1002, 'Event', 'S70622', 'Pertandingan Tilawah Al-Quran Peringkat Universiti 2026', 'Pertandingan antara 9 orang pelajar dari seluruh fakulti di UMT. Yang terbaik akan terpilih untuk mewakili UMT ke Pertandingan Tilawah Al-Quran peringkat Kebangsaan pada 27 September akan datang.', 'Untuk melahirkan Qari & Qariah UMT yang berdaya saing di peringkat Kebangsaan\r\nUntuk memupuk perasaan cinta akan Al-Quran', 'SDG 16: Peace, Justice & Strong Institutions', 'SDG 16: Peace, Justice & Strong Institutions ^ Menunjukkan yang Islam merupakan agama Kedamaian', NULL, NULL, NULL, NULL, '2026-07-16', '2026-07-16', 1, 9, 0, 0, '', 9, 80.00, 0, 'Pending_Advisor', 55, '<ul class=\'mb-3 list-unstyled\' style=\'line-height: 1.8;\'><li class=\'mb-2\'><i class=\'fas fa-check-circle text-success me-2\'></i><span class=\'text-success\'><b>Efficient Financials:</b> Optimum spending (RM8.89/pax).</span></li><li class=\'mb-2\'><i class=\'fas fa-exclamation-triangle text-danger me-2\'></i><span class=\'text-danger\'><b>Annual Limit (CRITICAL):</b> Exceeds RM 1,000 yearly club limit with NO sponsorship listed.</span></li><li class=\'mb-2\'><i class=\'fas fa-check-circle text-success me-2\'></i><span class=\'text-success\'><b>Controlled Logistics:</b> Daily participant capacity is well managed.</span></li><li class=\'mb-2\'><i class=\'fas fa-clock text-warning me-2\'></i><span class=\'text-warning text-dark\'><b>Timeline:</b> 24 days notice. Submit immediately.</span></li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>AI Viability Index:</h6><div><span class=\'badge bg-warning text-dark fs-6 shadow-sm\'><i class=\'fas fa-exclamation-triangle me-1\'></i> MODERATE (55%)</span></div></div><div class=\'mt-3 p-3 bg-warning bg-opacity-10 rounded border border-warning\'><small class=\'text-warning-emphasis fw-bold d-block mb-1\'>AI Judgement:</small> <small class=\'text-dark\'>PROCEED WITH CAUTION. The system detects some logistical or financial inefficiencies.</small></div>', '2026-06-21 09:54:25', '2026-06-21 22:21:09', NULL, 'Masjid UMT', 'Pelajar UMT', NULL, NULL, 0, '', 1, 'Error processing AI logic. Please check your inputs.'),
 (92, 10006, 'Event', 'S70810', 'Zombie Run 3.0 ', 'Blablabla', 'Untuk blablabla\r\nUntuk Blablabla', 'SDG 3: Good Health & Well-being', 'SDG 3: Good Health & Well-being ^ Lari2', NULL, 'uploads/erisk/PROPOSAL_92_ERISK_Cover_Letter_-_KBMC.pdf', NULL, NULL, '2026-07-04', '2026-07-04', 1, 300, 0, 0, '', 300, 1400.00, 0, 'Meeting_Scheduled', 25, '<ul class=\'mb-3 list-unstyled\' style=\'line-height: 1.8;\'><li class=\'mb-2\'><i class=\'fas fa-check-circle text-success me-2\'></i><span class=\'text-success\'><b>Efficient Financials:</b> Optimum spending (RM7.00/pax).</span></li><li class=\'mb-2\'><i class=\'fas fa-exclamation-triangle text-danger me-2\'></i><span class=\'text-danger\'><b>Annual Limit (CRITICAL):</b> Exceeds RM 1,000 yearly club limit with NO sponsorship listed.</span></li><li class=\'mb-2\'><i class=\'fas fa-info-circle text-warning me-2\'></i><span class=\'text-warning text-dark\'><b>Participant Density:</b> Moderate crowd (300 pax/day).</span></li><li class=\'mb-2\'><i class=\'fas fa-clock text-danger me-2\'></i><span class=\'text-danger\'><b>Timing Warning:</b> Very short notice (13 days).</span></li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>AI Viability Index:</h6><div><span class=\'badge bg-danger fs-6 shadow-sm\'><i class=\'fas fa-times-circle me-1\'></i> BERISIKO (25%)</span></div></div><div class=\'mt-3 p-3 bg-danger bg-opacity-10 rounded border border-danger\'><small class=\'text-danger fw-bold d-block mb-1\'>AI Judgement:</small> <small class=\'text-dark\'>NOT RECOMMENDED. This proposal has critical flaws. High probability of rejection.</small></div>', '2026-06-21 11:51:28', '2026-06-21 11:56:01', 'PITCHING SCHEDULED.\nTarikh & Masa: 2026-06-22 19:55:00\nLink/Lokasi: https://meet.google.com/abc-defg-hij', 'PSR, UMT', 'Pelajar UMT', '2026-06-22 19:55:00', 'https://meet.google.com/abc-defg-hij', 1, '', 1, NULL),
 (93, 1002, 'Event', 'S70622', 'Pertandingan Azan', 'mencari bilal baru', 'Untuk\r\nUntuk', 'SDG 10: Reduced Inequalities', 'SDG 10: Reduced Inequalities ^ Nice', NULL, NULL, NULL, NULL, '2026-06-24', '2026-06-24', 1, 200, 0, 0, '', 200, 2000.00, 0, 'Pending_Advisor', 25, '<ul class=\'mb-3 list-unstyled\' style=\'line-height: 1.8;\'><li class=\'mb-2\'><i class=\'fas fa-check-circle text-success me-2\'></i><span class=\'text-success\'><b>Efficient Financials:</b> Optimum spending (RM10.00/pax).</span></li><li class=\'mb-2\'><i class=\'fas fa-exclamation-triangle text-danger me-2\'></i><span class=\'text-danger\'><b>Annual Limit (CRITICAL):</b> Exceeds RM 1,000 yearly club limit with NO sponsorship listed.</span></li><li class=\'mb-2\'><i class=\'fas fa-info-circle text-warning me-2\'></i><span class=\'text-warning text-dark\'><b>Participant Density:</b> Moderate crowd (200 pax/day).</span></li><li class=\'mb-2\'><i class=\'fas fa-clock text-danger me-2\'></i><span class=\'text-danger\'><b>Timing Warning:</b> Very short notice (2 days).</span></li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>AI Viability Index:</h6><div><span class=\'badge bg-danger fs-6 shadow-sm\'><i class=\'fas fa-times-circle me-1\'></i> BERISIKO (25%)</span></div></div><div class=\'mt-3 p-3 bg-danger bg-opacity-10 rounded border border-danger\'><small class=\'text-danger fw-bold d-block mb-1\'>AI Judgement:</small> <small class=\'text-dark\'>NOT RECOMMENDED. This proposal has critical flaws. High probability of rejection.</small></div>', '2026-06-21 21:50:36', '2026-06-21 21:50:36', NULL, 'Masjid UMT', 'Pelajar UMT', NULL, NULL, 0, '', 1, 'No AI Analysis requested during submission.'),
-(94, 1002, 'Event', 'S70622', 'Bengkel Khat', 'aaa', 'aaa', 'SDG 1: No Poverty', 'SDG 1: No Poverty ^ aaa', NULL, NULL, NULL, NULL, '2026-07-10', '2026-07-10', 1, 30, 0, 0, '', 30, 350.00, 0, 'Pending_Advisor', 75, '<ul class=\'mb-3 list-unstyled\' style=\'line-height: 1.8;\'><li class=\'mb-2\'><i class=\'fas fa-check-circle text-success me-2\'></i><span class=\'text-success\'><b>Efficient Financials:</b> Optimum spending (RM11.67/pax).</span></li><li class=\'mb-2\'><i class=\'fas fa-info-circle text-warning me-2\'></i><span class=\'text-warning text-dark\'><b>Annual Limit:</b> Exceeds RM 1,000 yearly limit, but external funding noted.</span></li><li class=\'mb-2\'><i class=\'fas fa-check-circle text-success me-2\'></i><span class=\'text-success\'><b>Controlled Logistics:</b> Daily participant capacity is well managed.</span></li><li class=\'mb-2\'><i class=\'fas fa-clock text-warning me-2\'></i><span class=\'text-warning text-dark\'><b>Timeline:</b> 18 days notice. Submit immediately.</span></li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>AI Viability Index:</h6><div><span class=\'badge bg-success fs-6 shadow-sm\'><i class=\'fas fa-check-circle me-1\'></i> OPTIMUM (75%)</span></div></div><div class=\'mt-3 p-3 bg-success bg-opacity-10 rounded border border-success\'><small class=\'text-success fw-bold d-block mb-1\'>AI Judgement:</small> <small class=\'text-dark\'>HIGHLY RECOMMENDED. Clear calendar, solid planning, and budget meets specifications.</small></div>', '2026-06-21 22:14:14', '2026-06-21 22:14:14', NULL, 'Masjid UMT', 'Pelajar UMT', NULL, NULL, 0, 'Yuran Penyertaan RM5', 1, 'Efficient Financials: Optimum spending (RM11.67/pax).Annual Limit: Exceeds RM 1,000 yearly limit, but external funding noted.Controlled Logistics: Daily participant capacity is well managed.Timeline: 18 days notice. Submit immediately.AI Viability Index: OPTIMUM (75%)AI Judgement: HIGHLY RECOMMENDED. Clear calendar, solid planning, and budget meets specifications. System Auto-Generated Executive Summary:\"The system has analyzed \'Bengkel Khat\'. Based on the heuristic matrix, please ensure all logistical and financial preparations adhere to university guidelines ahead of the 1-day schedule.\"'),
-(95, 1002, 'Event', 'S70622', 'Program UMT Berselawat 2026', 'Program ini diadakan bertujuan untuk menyemarakkan aktiviti selawat dan munajat, mengingati Rasulullah SAW.', 'Untuk meningkatkan\r\nUntuk mewujudkan', 'SDG 16: Peace, Justice & Strong Institutions', 'SDG 16: Peace, Justice & Strong Institutions ^ Memberikan ketenangan dan peringatan akan Rasulullah', NULL, NULL, NULL, NULL, '2026-07-11', '2026-07-11', 1, 500, 0, 0, '', 500, 3740.00, 0, 'Draft', 0, '', '2026-06-22 02:01:31', '2026-06-22 02:01:31', NULL, 'Masjid UMT', 'Warga UMT', NULL, NULL, 0, 'Tajaan Cenderamata Syarikat ABC Sdn. Bhd. RM300', 1, NULL);
+(94, 1002, 'Event', 'S70622', 'Bengkel Khat', 'aaa', 'aaa', 'SDG 1: No Poverty', 'SDG 1: No Poverty ^ aaa', NULL, 'uploads/erisk/PROPOSAL_94_ERISK_cv_from_profile.pdf', NULL, NULL, '2026-07-10', '2026-07-10', 1, 30, 0, 0, '', 30, 350.00, 0, 'Pending_Advisor', 75, '<ul class=\'mb-3 list-unstyled\' style=\'line-height: 1.8;\'><li class=\'mb-2\'><i class=\'fas fa-check-circle text-success me-2\'></i><span class=\'text-success\'><b>Efficient Financials:</b> Optimum spending (RM11.67/pax).</span></li><li class=\'mb-2\'><i class=\'fas fa-info-circle text-warning me-2\'></i><span class=\'text-warning text-dark\'><b>Annual Limit:</b> Exceeds RM 1,000 yearly limit, but external funding noted.</span></li><li class=\'mb-2\'><i class=\'fas fa-check-circle text-success me-2\'></i><span class=\'text-success\'><b>Controlled Logistics:</b> Daily participant capacity is well managed.</span></li><li class=\'mb-2\'><i class=\'fas fa-clock text-warning me-2\'></i><span class=\'text-warning text-dark\'><b>Timeline:</b> 18 days notice. Submit immediately.</span></li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>AI Viability Index:</h6><div><span class=\'badge bg-success fs-6 shadow-sm\'><i class=\'fas fa-check-circle me-1\'></i> OPTIMUM (75%)</span></div></div><div class=\'mt-3 p-3 bg-success bg-opacity-10 rounded border border-success\'><small class=\'text-success fw-bold d-block mb-1\'>AI Judgement:</small> <small class=\'text-dark\'>HIGHLY RECOMMENDED. Clear calendar, solid planning, and budget meets specifications.</small></div>', '2026-06-21 22:14:14', '2026-06-22 12:13:48', NULL, 'Masjid UMT', 'Pelajar UMT', NULL, NULL, 0, 'Yuran Penyertaan RM5', 1, 'Efficient Financials: Optimum spending (RM11.67/pax).Annual Limit: Exceeds RM 1,000 yearly limit, but external funding noted.Controlled Logistics: Daily participant capacity is well managed.Timeline: 18 days notice. Submit immediately.AI Viability Index: OPTIMUM (75%)AI Judgement: HIGHLY RECOMMENDED. Clear calendar, solid planning, and budget meets specifications. System Auto-Generated Executive Summary:\"The system has analyzed \'Bengkel Khat\'. Based on the heuristic matrix, please ensure all logistical and financial preparations adhere to university guidelines ahead of the 1-day schedule.\"'),
+(95, 1002, 'Event', 'S70622', 'Program UMT Berselawat 2026', 'Program ini diadakan bertujuan untuk menyemarakkan aktiviti selawat dan munajat, mengingati Rasulullah SAW.', 'Untuk meningkatkan\r\nUntuk mewujudkan', 'SDG 16: Peace, Justice & Strong Institutions', 'SDG 16: Peace, Justice & Strong Institutions ^ Memberikan ketenangan dan peringatan akan Rasulullah', NULL, NULL, NULL, NULL, '2026-07-11', '2026-07-11', 1, 500, 0, 0, '', 500, 3740.00, 0, 'Draft', 0, '', '2026-06-22 02:01:31', '2026-06-22 02:01:31', NULL, 'Masjid UMT', 'Warga UMT', NULL, NULL, 0, 'Tajaan Cenderamata Syarikat ABC Sdn. Bhd. RM300', 1, NULL),
+(96, 1002, 'Event', 'S70622', 'ProgramTestHideCredential', 'ProgramTestHideCredential', 'To\r\nTo\r\nTo', 'SDG 2: Zero Hunger', 'SDG 2: Zero Hunger ^ To', NULL, NULL, NULL, NULL, '2026-07-11', '2026-07-11', 1, 500, 0, 0, '', 500, 10.00, 0, 'Draft', 0, '', '2026-06-28 07:30:16', '2026-06-28 07:30:16', NULL, 'Masjid UMT', 'Warga UMT', NULL, NULL, 0, 'Sponsor By Mammy Sdn. Bhd.', 1, NULL),
+(97, 1002, 'Event', 'S70622', 'ProgramTestHideCredential2', 'ProgramTestHideCredential2', 'to\r\nto', 'SDG 7: Affordable & Clean Energy', 'SDG 7: Affordable & Clean Energy ^ ProgramTestHideCredential2', NULL, NULL, NULL, NULL, '2026-07-11', '2026-07-11', 1, 50, 0, 0, '', 50, 110.00, 0, 'Pending_Advisor', 25, '<ul class=\'mb-3 list-unstyled\' style=\'line-height: 1.8;\'><li class=\'mb-2\'><i class=\'fas fa-info-circle text-warning me-2\'></i><span class=\'text-warning text-dark\'><b>Doubtful Financials:</b> Unusually low cost (RM2.20/pax).</span></li><li class=\'mb-2\'><i class=\'fas fa-exclamation-triangle text-danger me-2\'></i><span class=\'text-danger\'><b>Annual Limit (CRITICAL):</b> Exceeds RM 1,000 yearly club limit with NO sponsorship listed.</span></li><li class=\'mb-2\'><i class=\'fas fa-check-circle text-success me-2\'></i><span class=\'text-success\'><b>Controlled Logistics:</b> Daily participant capacity is well managed.</span></li><li class=\'mb-2\'><i class=\'fas fa-clock text-danger me-2\'></i><span class=\'text-danger\'><b>Timing Warning:</b> Very short notice (13 days).</span></li></ul><hr><div class=\'d-flex align-items-center justify-content-between\'><h6 class=\'fw-bold mb-0\'>AI Viability Index:</h6><div><span class=\'badge bg-danger fs-6 shadow-sm\'><i class=\'fas fa-times-circle me-1\'></i> BERISIKO (25%)</span></div></div><div class=\'mt-3 p-3 bg-danger bg-opacity-10 rounded border border-danger\'><small class=\'text-danger fw-bold d-block mb-1\'>AI Judgement:</small> <small class=\'text-dark\'>NOT RECOMMENDED. This proposal has critical flaws. High probability of rejection.</small></div>', '2026-06-28 07:56:42', '2026-06-28 07:56:42', NULL, 'Masjid UMT', 'Warga UMT', NULL, NULL, 0, '', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -517,7 +522,7 @@ CREATE TABLE `master_calendar` (
   `eventTitle` varchar(200) NOT NULL,
   `startDate` date NOT NULL,
   `endDate` date NOT NULL,
-  `eventType` enum('Exam','Public Holiday','Convocation','UMT Official','Ramadan','Others') NOT NULL,
+  `eventType` enum('Exam','Public Holiday','Convocation','UMT Official','Ramadan','Others','Urgent') NOT NULL,
   `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -542,7 +547,8 @@ INSERT INTO `master_calendar` (`calendarId`, `eventTitle`, `startDate`, `endDate
 (14, 'Hari Raya Haji', '2026-05-27', '2026-05-27', 'Public Holiday', 'Federal Holiday (2026)'),
 (15, 'Awal Muharram', '2026-06-16', '2026-06-16', 'Public Holiday', 'Federal Holiday (2026)'),
 (16, 'Prophet Muhammad\'s Birthday', '2026-09-24', '2026-09-24', 'Public Holiday', 'Federal Holiday (2026)'),
-(17, 'Study Week', '2026-01-18', '2026-01-22', 'UMT Official', 'Undergraduate students having study week before their final exam. good Luck!s');
+(17, 'Study Week', '2026-01-18', '2026-01-22', 'UMT Official', 'Undergraduate students having study week before their final exam. good Luck!s'),
+(20, 'Birthday Haikal', '2026-07-04', '2026-07-04', 'Others', '');
 
 -- --------------------------------------------------------
 
@@ -937,7 +943,12 @@ INSERT INTO `notifications` (`notificationId`, `clubId`, `title`, `message`, `ty
 (369, 1002, 'New Proposal Submitted', 'Sila semak kertas kerja baharu: Pertandingan Tilawah Al-Quran Peringkat Universiti 2026', 'STATUS', '/advisor/pending', 'Review Now', 0, '2026-06-21 22:21:09', 'Advisor'),
 (370, 1002, 'Proposal Submitted', 'Kertas kerja anda \'Pertandingan Tilawah Al-Quran Peringkat Universiti 2026\' telah berjaya dihantar kepada Penasihat.', 'STATUS', '/chc/track?id=91', 'Track Status', 0, '2026-06-21 22:21:09', 'CHC'),
 (371, 1002, 'New Proposal Submitted', 'Sila semak kertas kerja baharu: Program Santuni Komuniti Tempatan', 'STATUS', '/advisor/pending', 'Review Now', 0, '2026-06-21 22:40:45', 'Advisor'),
-(372, 1002, 'Proposal Submitted', 'Kertas kerja anda \'Program Santuni Komuniti Tempatan\' telah berjaya dihantar kepada Penasihat.', 'STATUS', '/chc/track?id=66', 'Track Status', 0, '2026-06-21 22:40:45', 'CHC');
+(372, 1002, 'Proposal Submitted', 'Kertas kerja anda \'Program Santuni Komuniti Tempatan\' telah berjaya dihantar kepada Penasihat.', 'STATUS', '/chc/track?id=66', 'Track Status', 0, '2026-06-21 22:40:45', 'CHC'),
+(373, 1002, 'Pitching Scheduled', 'Sesi pembentangan (Pitching) bagi kertas kerja \'EventTestNormalizedV3\' telah dijadualkan pada: 2026-06-30 15:30', 'STATUS', '/chc/track?id=79', 'View Link', 1, '2026-06-28 07:31:11', 'CHC'),
+(374, 1002, 'New Proposal Submitted', 'Sila semak kertas kerja baharu: ProgramTestHideCredential2', 'STATUS', '/advisor/pending', 'Review Now', 0, '2026-06-28 07:56:42', 'Advisor'),
+(375, 1002, 'Proposal Submitted', 'Kertas kerja anda \'ProgramTestHideCredential2\' telah berjaya dihantar kepada Penasihat.', 'STATUS', '/chc/track?id=97', 'Track Status', 0, '2026-06-28 07:56:42', 'CHC'),
+(376, 1001, 'Kertas Kerja Diluluskan Penuh!', 'Tahniah! Kertas kerja \'Bengkel C#\' diluluskan akhir oleh HEPA.', 'STATUS', '/chc/track?id=39', 'Lihat', 0, '2026-06-30 07:48:44', 'CHC'),
+(377, 1001, 'Kelulusan Akhir HEPA', 'Kertas kerja kelab seliaan anda telah diluluskan sepenuhnya.', 'STATUS', '/advisor/dashboard', 'Lihat', 0, '2026-06-30 07:48:44', 'Advisor');
 
 -- --------------------------------------------------------
 
@@ -989,7 +1000,9 @@ INSERT INTO `proposal_budgets` (`budgetId`, `proposalId`, `itemName`, `quantity`
 (65, 66, 'Makanan Peserta', 1, 110.00, 110.00),
 (66, 66, 'Hadiah', 1, 10.00, 10.00),
 (69, 95, 'Makanan Peserta & AJK', 520, 7.00, 3640.00),
-(70, 95, 'Cenderamata Jemputan', 1, 100.00, 100.00);
+(70, 95, 'Cenderamata Jemputan', 1, 100.00, 100.00),
+(71, 96, 'Makanan Peserta & AJK', 1, 10.00, 10.00),
+(72, 97, 'Makanan Peserta & AJK', 11, 10.00, 110.00);
 
 -- --------------------------------------------------------
 
@@ -1031,7 +1044,9 @@ INSERT INTO `proposal_committees` (`committeeId`, `proposalId`, `matricNo`, `nam
 (46, 94, 'S70622', 'Haikal', 'Director'),
 (47, 91, 'S70622', 'Haikal', 'Director'),
 (48, 66, 'S222222', 'EventTestNormalizedV1', 'Director'),
-(50, 95, 'S70622', 'Haikal', 'Director');
+(50, 95, 'S70622', 'Haikal', 'Director'),
+(51, 96, 'S70622', 'Haikal', 'Director'),
+(52, 97, 'S70622', 'Haikal', 'Director');
 
 -- --------------------------------------------------------
 
@@ -1089,7 +1104,36 @@ INSERT INTO `proposal_itineraries` (`itineraryId`, `proposalId`, `day`, `time`, 
 (82, 91, 'DAY 1', '08:00', 'Pendaftaran'),
 (83, 91, 'DAY 1', '09:00', 'Pusingan 1'),
 (84, 66, 'DAY 1', '11:11', 'aaa'),
-(86, 95, 'DAY 1', '21:00', 'Mula Bermunajjat');
+(86, 95, 'DAY 1', '21:00', 'Mula Bermunajjat'),
+(87, 96, 'DAY 1', '11:11', 'ProgramTestHideCredential'),
+(88, 97, 'DAY 1', '11:11', 'ProgramTestHideCredential2');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system_documents`
+--
+
+CREATE TABLE `system_documents` (
+  `docId` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `category` varchar(100) NOT NULL,
+  `filePath` varchar(255) NOT NULL,
+  `fileType` varchar(10) DEFAULT 'pdf',
+  `fileSize` varchar(20) DEFAULT 'Unknown',
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `uploaded_by` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `system_documents`
+--
+
+INSERT INTO `system_documents` (`docId`, `title`, `category`, `filePath`, `fileType`, `fileSize`, `updatedAt`, `uploaded_by`) VALUES
+(1, 'How to Review a Proposal', 'Event Proposal', 'uploads/guidelines/review_manual.pdf', 'pdf', '2.4 MB', '2026-06-22 11:41:45', NULL),
+(2, 'Budget Limit Guidelines', 'Event Proposal', 'uploads/guidelines/budget_limits.pdf', 'pdf', '1.1 MB', '2026-06-22 11:41:45', NULL),
+(3, 'E-Risk Submission Manual', 'E-Risk', 'uploads/guidelines/erisk_manual.docx', 'word', '3.0 MB', '2026-06-22 11:41:45', NULL),
+(5, 'Program Poster Guidelines', 'Program Advertisement', 'uploads/documents/1782739838167_Program_Poster_Guidelines.pdf', 'pdf', '15 KB', '2026-06-29 13:30:38', 'HEPA Admin');
 
 -- --------------------------------------------------------
 
@@ -1213,6 +1257,12 @@ ALTER TABLE `proposal_itineraries`
   ADD KEY `proposalId` (`proposalId`);
 
 --
+-- Indexes for table `system_documents`
+--
+ALTER TABLE `system_documents`
+  ADD PRIMARY KEY (`docId`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
@@ -1233,7 +1283,7 @@ ALTER TABLE `agm_report`
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `logId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=211;
+  MODIFY `logId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=214;
 
 --
 -- AUTO_INCREMENT for table `clubs`
@@ -1251,37 +1301,43 @@ ALTER TABLE `club_memberships`
 -- AUTO_INCREMENT for table `eventproposal`
 --
 ALTER TABLE `eventproposal`
-  MODIFY `proposalId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+  MODIFY `proposalId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT for table `master_calendar`
 --
 ALTER TABLE `master_calendar`
-  MODIFY `calendarId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `calendarId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notificationId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=373;
+  MODIFY `notificationId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=378;
 
 --
 -- AUTO_INCREMENT for table `proposal_budgets`
 --
 ALTER TABLE `proposal_budgets`
-  MODIFY `budgetId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `budgetId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT for table `proposal_committees`
 --
 ALTER TABLE `proposal_committees`
-  MODIFY `committeeId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `committeeId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `proposal_itineraries`
 --
 ALTER TABLE `proposal_itineraries`
-  MODIFY `itineraryId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
+  MODIFY `itineraryId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
+
+--
+-- AUTO_INCREMENT for table `system_documents`
+--
+ALTER TABLE `system_documents`
+  MODIFY `docId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables

@@ -281,4 +281,23 @@ public class MPPDashboardDAO {
         }
         return 0;
     }
+
+    public int getTotalEventsByYear(int year) {
+        int total = 0;
+        // Example SQL: "SELECT COUNT(*) FROM events WHERE YEAR(event_date) = ?"
+        String sql = "SELECT COUNT(*) FROM eventproposal WHERE EXTRACT(YEAR FROM proposedDate) = ? AND status = 'Approved'";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, year);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return total;
+    }
 }

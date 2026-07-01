@@ -1,5 +1,6 @@
 package controller.advisor;
 
+import dao.NotificationDAO;
 import dao.ProposalDAO;
 import model.User;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.Notification;
 
 @WebServlet(name = "ClubDirectoryServlet", urlPatterns = {"/advisor/directory"})
 public class ClubDirectoryServlet extends HttpServlet {
@@ -43,15 +45,26 @@ public class ClubDirectoryServlet extends HttpServlet {
                 List<Map<String, Object>> chcList = dao.getClubCHC(clubId);
                 List<Map<String, Object>> memberList = dao.getClubMembers(clubId);
                 List<Map<String, Object>> allList = dao.getAllClubMembers(clubId);
-                
+
                 // 3. Pass data to the JSP
                 request.setAttribute("chcList", chcList);
                 request.setAttribute("memberList", memberList);
                 request.setAttribute("allList", allList);
-                
-                // Fetch unread notifications for the top bar (keeping your existing UX intact)
-                int unreadCount = dao.getUnreadNotificationCountForAdvisor(clubId);
-                request.setAttribute("unreadCount", unreadCount);
+
+                // 1. Initialize our modern notification DAO
+                NotificationDAO notifDAO = new NotificationDAO();
+                String userId = user.getUserId(); // Get the advisor's logged-in unique ID
+
+                // 2. Fetch the advisor's specific club ID dynamically if not already available
+                int realClubIdForAdvisor = dao.getClubIdByAdvisorId(userId);
+
+                // 3. Query unread alerts directly from the user-isolated tracking table
+                java.util.List<Notification> notifications = notifDAO.getUnreadNotifications(realClubIdForAdvisor, userId);
+
+                // 4. Set attributes cleanly to match what topbar.jsp expects
+                request.setAttribute("notifications", notifications);
+                request.setAttribute("notificationCount", notifications.size());
+
             }
 
             // 4. Forward to the new JSP page we just created

@@ -627,12 +627,16 @@ public class ProposalDAO {
         }
     }
 
-    public List<Map<String, Object>> getClubNotifications(int clubId) {
+    // 1. CHC ROLE: Fetch Notifications Joined with Junction Table
+    public List<Map<String, Object>> getClubNotifications(int clubId, String userId) {
         List<Map<String, Object>> list = new java.util.ArrayList<>();
-        String sql = "SELECT * FROM notifications WHERE clubId = ? AND targetRole IN ('All', 'CHC') ORDER BY createdAt DESC";
-
+        String sql = "SELECT n.* FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.clubId = ? AND n.targetRole IN ('All', 'CHC') AND uns.notificationId IS NULL "
+                + "ORDER BY n.createdAt DESC";
         try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, clubId);
+            ps.setString(1, userId);
+            ps.setInt(2, clubId);
             try (java.sql.ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> map = new java.util.HashMap<>();
@@ -642,7 +646,6 @@ public class ProposalDAO {
                     map.put("type", rs.getString("type"));
                     map.put("actionLink", rs.getString("actionLink"));
                     map.put("actionLabel", rs.getString("actionLabel"));
-                    map.put("isRead", rs.getInt("isRead"));
                     map.put("createdAt", rs.getTimestamp("createdAt"));
                     list.add(map);
                 }
@@ -653,12 +656,15 @@ public class ProposalDAO {
         return list;
     }
 
-    public int getUnreadNotificationCount(int clubId) {
+    // 2. CHC ROLE: Count Unread Notifications via Junction Table
+    public int getUnreadNotificationCount(int clubId, String userId) {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM notifications WHERE clubId = ? AND isRead = 0 AND targetRole IN ('All', 'CHC')";
-
+        String sql = "SELECT COUNT(*) FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.clubId = ? AND n.targetRole IN ('All', 'CHC') AND uns.notificationId IS NULL";
         try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, clubId);
+            ps.setString(1, userId);
+            ps.setInt(2, clubId);
             try (java.sql.ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt(1);
@@ -686,8 +692,8 @@ public class ProposalDAO {
     }
 
     public void createNotification(int clubId, String title, String message, String type, String actionLink) {
-        String sql = "INSERT INTO notifications (clubId, title, message, type, actionLink, actionLabel, isRead) "
-                + "VALUES (?, ?, ?, ?, ?, 'Lihat', 0)";
+        String sql = "INSERT INTO notifications (clubId, title, message, type, actionLink, actionLabel, targetRole) "
+                + "VALUES (?, ?, ?, ?, ?, 'Lihat', 'CHC')";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, clubId);
             ps.setString(2, title);
@@ -715,19 +721,19 @@ public class ProposalDAO {
         return "Unknown Club";
     }
 
-    public boolean markAllNotificationsAsRead(int clubId) {
-        boolean isSuccess = false;
-        String sql = "UPDATE notifications SET isRead = 1 WHERE clubId = ?";
+    // 3. CHC ROLE: Mark Notifications as Read using Junction Table
+    public boolean markAllNotificationsAsRead(int clubId, String userId) {
+        String sql = "INSERT INTO user_notification_status (notificationId, userId) "
+                + "SELECT notificationId, ? FROM notifications WHERE clubId = ? AND targetRole IN ('All', 'CHC') "
+                + "ON DUPLICATE KEY UPDATE isRead = 1";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, clubId);
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected > 0) {
-                isSuccess = true;
-            }
+            ps.setString(1, userId);
+            ps.setInt(2, clubId);
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return isSuccess;
     }
 
     public boolean deleteProposal(int proposalId) {
@@ -746,9 +752,8 @@ public class ProposalDAO {
     }
 
     public void createNotificationWithRole(int clubId, String title, String message, String type, String actionLink, String actionLabel, String role) {
-        String sql = "INSERT INTO notifications (clubId, title, message, type, actionLink, actionLabel, targetRole, isRead) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
-
+        String sql = "INSERT INTO notifications (clubId, title, message, type, actionLink, actionLabel, targetRole) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, clubId);
             ps.setString(2, title);
@@ -757,7 +762,6 @@ public class ProposalDAO {
             ps.setString(5, actionLink);
             ps.setString(6, actionLabel);
             ps.setString(7, role);
-
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -781,7 +785,6 @@ public class ProposalDAO {
                 + "JOIN clubs c ON p.clubId = c.clubId "
                 + "WHERE c.advisorId = ? AND p.Status = 'Pending_Advisor' "
                 + "ORDER BY " + orderByClause;
-
         try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, advisorId);
             try (java.sql.ResultSet rs = ps.executeQuery()) {
@@ -800,17 +803,14 @@ public class ProposalDAO {
                     map.put("targetAudience", rs.getString("targetAudience"));
                     map.put("estimateParticipant", rs.getInt("estimateParticipant"));
                     map.put("description", rs.getString("description"));
-
                     String dateStr = rs.getString("proposedDate");
                     int duration = rs.getInt("duration");
                     int pax = rs.getInt("estimateParticipant");
                     double budget = rs.getDouble("estimateBudget");
                     int clubId = rs.getInt("clubId");
                     boolean isClubFunded = rs.getBoolean("isClubFunded");
-
                     String aiReport = aiEngine.generateAIAssessment(clubId, dateStr, duration, pax, budget, "", isClubFunded);
                     map.put("aiSuggestion", aiReport);
-
                     list.add(map);
                 }
             }
@@ -839,6 +839,7 @@ public class ProposalDAO {
     public int getClubIdByAdvisorId(String advisorId) {
         String sql = "SELECT clubId FROM clubs WHERE advisorId = ? LIMIT 1";
         try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, advisorId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -851,11 +852,18 @@ public class ProposalDAO {
         return -1;
     }
 
-    public List<Map<String, Object>> getClubNotificationsForAdvisor(int clubId) {
+    // 4. ADVISOR ROLE: Fetch Notifications
+    public List<Map<String, Object>> getClubNotificationsForAdvisor(int clubId, String userId) {
         List<Map<String, Object>> list = new java.util.ArrayList<>();
-        String sql = "SELECT * FROM notifications WHERE clubId = ? AND targetRole IN ('All', 'Advisor') ORDER BY createdAt DESC";
+        String sql = "SELECT n.* FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.clubId = ? AND n.targetRole IN ('All', 'Advisor') AND uns.notificationId IS NULL "
+                + "ORDER BY n.createdAt DESC";
+
         try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, clubId);
+
+            ps.setString(1, userId);
+            ps.setInt(2, clubId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> map = new java.util.HashMap<>();
@@ -865,7 +873,6 @@ public class ProposalDAO {
                     map.put("type", rs.getString("type"));
                     map.put("actionLink", rs.getString("actionLink"));
                     map.put("actionLabel", rs.getString("actionLabel"));
-                    map.put("isRead", rs.getInt("isRead"));
                     map.put("createdAt", rs.getTimestamp("createdAt"));
                     list.add(map);
                 }
@@ -876,11 +883,17 @@ public class ProposalDAO {
         return list;
     }
 
-    public int getUnreadNotificationCountForAdvisor(int clubId) {
+    // 5. ADVISOR ROLE: Count Notifications
+    public int getUnreadNotificationCountForAdvisor(int clubId, String userId) {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM notifications WHERE clubId = ? AND isRead = 0 AND targetRole IN ('All', 'Advisor')";
+        String sql = "SELECT COUNT(*) FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.clubId = ? AND n.targetRole IN ('All', 'Advisor') AND uns.notificationId IS NULL";
+
         try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, clubId);
+
+            ps.setString(1, userId);
+            ps.setInt(2, clubId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt(1);
@@ -965,20 +978,28 @@ public class ProposalDAO {
         return isSuccess;
     }
 
-    public List<Map<String, Object>> getNotificationsForMPP() {
+    // 6. MPP ROLE: Fetch Notifications
+    public List<Map<String, Object>> getNotificationsForMPP(String userId) {
         List<Map<String, Object>> list = new java.util.ArrayList<>();
-        String sql = "SELECT * FROM notifications WHERE targetRole = 'MPP' ORDER BY createdAt DESC";
-        try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Map<String, Object> map = new java.util.HashMap<>();
-                map.put("notificationId", rs.getInt("notificationId"));
-                map.put("title", rs.getString("title"));
-                map.put("message", rs.getString("message"));
-                map.put("type", rs.getString("type"));
-                map.put("actionLink", rs.getString("actionLink"));
-                map.put("isRead", rs.getInt("isRead"));
-                map.put("createdAt", rs.getTimestamp("createdAt"));
-                list.add(map);
+        String sql = "SELECT n.* FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.targetRole = 'MPP' AND uns.notificationId IS NULL "
+                + "ORDER BY n.createdAt DESC";
+
+        try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> map = new java.util.HashMap<>();
+                    map.put("notificationId", rs.getInt("notificationId"));
+                    map.put("title", rs.getString("title"));
+                    map.put("message", rs.getString("message"));
+                    map.put("type", rs.getString("type"));
+                    map.put("actionLink", rs.getString("actionLink"));
+                    map.put("createdAt", rs.getTimestamp("createdAt"));
+                    list.add(map);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -986,12 +1007,20 @@ public class ProposalDAO {
         return list;
     }
 
-    public int getUnreadNotificationCountForMPP() {
+    // 7. MPP ROLE: Count Notifications
+    public int getUnreadNotificationCountForMPP(String userId) {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM notifications WHERE targetRole = 'MPP' AND isRead = 0";
-        try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                count = rs.getInt(1);
+        String sql = "SELECT COUNT(*) FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.targetRole = 'MPP' AND uns.notificationId IS NULL";
+
+        try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -999,33 +1028,44 @@ public class ProposalDAO {
         return count;
     }
 
-    public boolean markAllNotificationsAsReadForMPP() {
-        boolean isSuccess = false;
-        String sql = "UPDATE notifications SET isRead = 1 WHERE targetRole = 'MPP'";
+    // 8. MPP ROLE: Mark Notifications as Read
+    public boolean markAllNotificationsAsReadForMPP(String userId) {
+        String sql = "INSERT INTO user_notification_status (notificationId, userId) "
+                + "SELECT notificationId, ? FROM notifications WHERE targetRole = 'MPP' "
+                + "ON DUPLICATE KEY UPDATE isRead = 1";
+
         try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            if (ps.executeUpdate() > 0) {
-                isSuccess = true;
-            }
+
+            ps.setString(1, userId);
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return isSuccess;
     }
 
-    public List<Map<String, Object>> getNotificationsForHEPA() {
+    // 9. HEPA ROLE: Fetch Notifications
+    public List<Map<String, Object>> getNotificationsForHEPA(String userId) {
         List<Map<String, Object>> list = new java.util.ArrayList<>();
-        String sql = "SELECT * FROM notifications WHERE targetRole = 'HEPA' ORDER BY createdAt DESC";
-        try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Map<String, Object> map = new java.util.HashMap<>();
-                map.put("notificationId", rs.getInt("notificationId"));
-                map.put("title", rs.getString("title"));
-                map.put("message", rs.getString("message"));
-                map.put("type", rs.getString("type"));
-                map.put("actionLink", rs.getString("actionLink"));
-                map.put("isRead", rs.getInt("isRead"));
-                map.put("createdAt", rs.getTimestamp("createdAt"));
-                list.add(map);
+        String sql = "SELECT n.* FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.targetRole = 'HEPA' AND uns.notificationId IS NULL "
+                + "ORDER BY n.createdAt DESC";
+
+        try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> map = new java.util.HashMap<>();
+                    map.put("notificationId", rs.getInt("notificationId"));
+                    map.put("title", rs.getString("title"));
+                    map.put("message", rs.getString("message"));
+                    map.put("type", rs.getString("type"));
+                    map.put("actionLink", rs.getString("actionLink"));
+                    map.put("createdAt", rs.getTimestamp("createdAt"));
+                    list.add(map);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1033,12 +1073,20 @@ public class ProposalDAO {
         return list;
     }
 
-    public int getUnreadNotificationCountForHEPA() {
+    // 10. HEPA ROLE: Count Notifications
+    public int getUnreadNotificationCountForHEPA(String userId) {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM notifications WHERE targetRole = 'HEPA' AND isRead = 0";
-        try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                count = rs.getInt(1);
+        String sql = "SELECT COUNT(*) FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.targetRole = 'HEPA' AND uns.notificationId IS NULL";
+
+        try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1046,9 +1094,15 @@ public class ProposalDAO {
         return count;
     }
 
-    public void markAllNotificationsAsReadForHEPA() {
-        String sql = "UPDATE notifications SET isRead = 1 WHERE targetRole = 'HEPA'";
+    // 11. HEPA ROLE: Mark Notifications as Read
+    public void markAllNotificationsAsReadForHEPA(String userId) {
+        String sql = "INSERT INTO user_notification_status (notificationId, userId) "
+                + "SELECT notificationId, ? FROM notifications WHERE targetRole = 'HEPA' "
+                + "ON DUPLICATE KEY UPDATE isRead = 1";
+
         try (Connection conn = util.DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -1178,20 +1232,28 @@ public class ProposalDAO {
         return list;
     }
 
-    public List<Map<String, Object>> getNotificationsForFaculty() {
+    // 12. FACULTY ROLE: Fetch Notifications
+    public List<Map<String, Object>> getNotificationsForFaculty(String userId) {
         List<Map<String, Object>> list = new java.util.ArrayList<>();
-        String sql = "SELECT * FROM notifications WHERE targetRole = 'Faculty' ORDER BY createdAt DESC";
-        try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql); java.sql.ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Map<String, Object> map = new java.util.HashMap<>();
-                map.put("notificationId", rs.getInt("notificationId"));
-                map.put("title", rs.getString("title"));
-                map.put("message", rs.getString("message"));
-                map.put("type", rs.getString("type"));
-                map.put("actionLink", rs.getString("actionLink"));
-                map.put("isRead", rs.getInt("isRead"));
-                map.put("createdAt", rs.getTimestamp("createdAt"));
-                list.add(map);
+        String sql = "SELECT n.* FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.targetRole = 'Faculty' AND uns.notificationId IS NULL "
+                + "ORDER BY n.createdAt DESC";
+
+        try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> map = new java.util.HashMap<>();
+                    map.put("notificationId", rs.getInt("notificationId"));
+                    map.put("title", rs.getString("title"));
+                    map.put("message", rs.getString("message"));
+                    map.put("type", rs.getString("type"));
+                    map.put("actionLink", rs.getString("actionLink"));
+                    map.put("createdAt", rs.getTimestamp("createdAt"));
+                    list.add(map);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1199,12 +1261,20 @@ public class ProposalDAO {
         return list;
     }
 
-    public int getUnreadNotificationCountForFaculty() {
+    // 13. FACULTY ROLE: Count Notifications
+    public int getUnreadNotificationCountForFaculty(String userId) {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM notifications WHERE targetRole = 'Faculty' AND isRead = 0";
-        try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql); java.sql.ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                count = rs.getInt(1);
+        String sql = "SELECT COUNT(*) FROM notifications n "
+                + "LEFT JOIN user_notification_status uns ON n.notificationId = uns.notificationId AND uns.userId = ? "
+                + "WHERE n.targetRole = 'Faculty' AND uns.notificationId IS NULL";
+
+        try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1212,9 +1282,15 @@ public class ProposalDAO {
         return count;
     }
 
-    public void markAllNotificationsAsReadForFaculty() {
-        String sql = "UPDATE notifications SET isRead = 1 WHERE targetRole = 'Faculty'";
+    // 14. FACULTY ROLE: Mark Notifications as Read
+    public void markAllNotificationsAsReadForFaculty(String userId) {
+        String sql = "INSERT INTO user_notification_status (notificationId, userId) "
+                + "SELECT notificationId, ? FROM notifications WHERE targetRole = 'Faculty' "
+                + "ON DUPLICATE KEY UPDATE isRead = 1";
+
         try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userId);
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -1249,14 +1325,18 @@ public class ProposalDAO {
         return list;
     }
 
-    public void markAllNotificationsAsReadForAdvisor(String advisorId) {
-        String sql = "UPDATE notifications n "
+    // 15. ADVISOR ROLE: Mark Notifications as Read
+    public void markAllNotificationsAsReadForAdvisor(String advisorId, String userId) {
+        String sql = "INSERT INTO user_notification_status (notificationId, userId) "
+                + "SELECT n.notificationId, ? FROM notifications n "
                 + "JOIN clubs c ON n.clubId = c.clubId "
-                + "SET n.isRead = 1 "
-                + "WHERE n.targetRole = 'Advisor' AND c.advisorId = ?";
+                + "WHERE n.targetRole = 'Advisor' AND c.advisorId = ? "
+                + "ON DUPLICATE KEY UPDATE isRead = 1";
 
         try (java.sql.Connection conn = util.DBConnection.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, advisorId);
+
+            ps.setString(1, userId);
+            ps.setString(2, advisorId);
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

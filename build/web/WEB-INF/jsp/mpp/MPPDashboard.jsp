@@ -12,36 +12,96 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
         <style>
-            /* Top Header Styling */
+            body {
+                background-color: #f8f9fa;
+            }
+
+            /* Top Header */
             .top-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
                 margin-bottom: 2rem;
                 padding: 1rem 0;
             }
+
+            /* Stat Cards */
             .stat-card {
                 background: white;
-                border-radius: 15px;
+                border-radius: 1rem;
                 padding: 1.5rem;
-                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-                transition: transform 0.2s;
+                transition: all 0.3s ease;
                 height: 100%;
+                border: none;
+                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04);
             }
             .stat-card:hover {
                 transform: translateY(-5px);
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
             }
-            .stat-card .icon {
-                font-size: 2rem;
-                margin-bottom: 1rem;
+            .icon-box {
+                width: 48px;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 12px;
+                font-size: 1.25rem;
             }
+
+            /* Welcome Card */
             .welcome-card {
                 background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
                 color: white;
-                border-radius: 15px;
-                padding: 2rem;
+                border-radius: 1rem;
+                padding: 2.5rem 2rem;
                 margin-bottom: 2rem;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+                position: relative;
+                overflow: hidden;
+            }
+            .welcome-card::after {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -10%;
+                width: 300px;
+                height: 300px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 50%;
+            }
+
+            /* Timeline for Recent Activities */
+            .timeline {
+                border-left: 2px solid #e9ecef;
+                padding-left: 1.5rem;
+                margin-left: 0.5rem;
+                margin-top: 1rem;
+            }
+            .timeline-item {
+                position: relative;
+                padding-bottom: 1.5rem;
+            }
+            .timeline-item:last-child {
+                padding-bottom: 0;
+            }
+            .timeline-item::before {
+                content: '';
+                position: absolute;
+                left: -1.85rem;
+                top: 0.25rem;
+                width: 14px;
+                height: 14px;
+                background: #0d6efd;
+                border: 3px solid white;
+                border-radius: 50%;
+                box-shadow: 0 0 0 2px #e9ecef;
+            }
+
+            /* Event Date Badge */
+            .date-badge {
+                min-width: 65px;
+                text-align: center;
+                background: #f1f5f9;
+                border-radius: 0.75rem;
+                padding: 0.5rem;
             }
         </style>
     </head>
@@ -50,156 +110,166 @@
         <%@ include file="/WEB-INF/jsp/include/sidebar.jsp" %>
 
         <div class="main-content">
-
-            <div class="top-header">
+            <div class="top-header d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <button class="btn btn-light text-primary me-3 d-lg-none shadow-sm" id="sidebarToggle">
                         <i class="fas fa-bars fa-lg"></i>
                     </button>
-
-                    <i class="fas fa-tachometer-alt fa-2x text-primary me-4 d-none d-lg-block"></i>
-                    <h3 class="fw-bold mb-0">Dashboard Overview</h3>
+                    <i class="fas fa-layer-group fa-2x text-primary me-3 d-none d-lg-block"></i>
+                    <h3 class="fw-bold mb-0 text-dark">Dashboard Overview</h3>
                 </div>
-
-                <%-- Panggil Standard Topbar UI --%>
                 <%@ include file="/WEB-INF/jsp/include/topbar.jsp" %>
             </div>
 
             <div class="welcome-card">
-                <div class="row align-items-center">
+                <div class="row align-items-center position-relative" style="z-index: 1;">
                     <div class="col-md-8">
-                        <h2>Welcome back, ${sessionScope.user.fullName != null ? sessionScope.user.fullName : 'User'}!</h2>
-                        <p class="lead mb-0 opacity-75">
-                            UMT ClubSphere • Student Club Management System<br>
-                            <span class="fs-6"><i class="far fa-clock me-1"></i> <fmt:formatDate value="<%=new java.util.Date()%>" pattern="EEEE, dd MMMM yyyy" /></span>
+                        <h2 class="fw-bold mb-2">Welcome back, ${sessionScope.user.fullName != null ? sessionScope.user.fullName : 'User'}!</h2>
+                        <p class="lead mb-0 opacity-75" style="font-size: 1.1rem;">
+                            UMT ClubSphere • Student Club Management System
                         </p>
+                        <div class="mt-3 bg-white bg-opacity-10 d-inline-block rounded-pill px-3 py-2 border border-light border-opacity-25">
+                            <i class="far fa-calendar-alt me-2"></i> 
+                            <fmt:formatDate value="<%=new java.util.Date()%>" pattern="EEEE, dd MMMM yyyy" />
+                        </div>
                     </div>
                     <div class="col-md-4 text-md-end d-none d-md-block"> 
-                        <div class="bg-white text-primary rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm"
-                             style="width: 100px; height: 100px; font-size: 3rem;">
-                            <i class="fas fa-user-tie"></i>
-                        </div>
+                        <img src="${pageContext.request.contextPath}/img/dashboard-illustration.svg" alt="" style="max-height: 120px; opacity: 0.9;" onerror="this.style.display='none'">
                     </div>
                 </div>
             </div>
 
             <div class="row g-4 mb-5">
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card border-start border-4 border-primary">
-                        <div class="d-flex justify-content-between align-items-start">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card border-bottom border-4 border-primary">
+                        <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <div class="text-muted small fw-bold text-uppercase mb-1">Active Clubs</div>
+                                <p class="text-muted small fw-bold text-uppercase mb-1">Active Clubs</p>
                                 <h3 class="fw-bold mb-0 text-dark">${activeClubs}</h3>
                             </div>
-                            <div class="icon text-primary bg-primary bg-opacity-10 rounded p-2" style="font-size: 1.2rem;">
+                            <div class="icon-box text-primary bg-primary bg-opacity-10">
                                 <i class="fas fa-users"></i>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card border-start border-4 border-success">
-                        <div class="d-flex justify-content-between align-items-start">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card border-bottom border-4 border-success">
+                        <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <div class="text-muted small fw-bold text-uppercase mb-1">Total Members</div>
+                                <p class="text-muted small fw-bold text-uppercase mb-1">Total Members</p>
                                 <h3 class="fw-bold mb-0 text-dark">${totalMembers}</h3>
                             </div>
-                            <div class="icon text-success bg-success bg-opacity-10 rounded p-2" style="font-size: 1.2rem;">
+                            <div class="icon-box text-success bg-success bg-opacity-10">
                                 <i class="fas fa-id-card"></i>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card border-start border-4 border-warning">
-                        <div class="d-flex justify-content-between align-items-start">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card border-bottom border-4 border-warning">
+                        <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <div class="text-muted small fw-bold text-uppercase mb-1">Events This Week</div>
+                                <p class="text-muted small fw-bold text-uppercase mb-1">Events This Week</p>
                                 <h3 class="fw-bold mb-0 text-dark">${eventsThisWeek}</h3>
                             </div>
-                            <div class="icon text-warning bg-warning bg-opacity-10 rounded p-2" style="font-size: 1.2rem;">
-                                <i class="far fa-calendar-alt"></i>
+                            <div class="icon-box text-warning bg-warning bg-opacity-10">
+                                <i class="far fa-calendar-check"></i>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card border-start border-4 border-danger">
-                        <div class="d-flex justify-content-between align-items-start">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card border-bottom border-4 border-danger">
+                        <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <div class="text-muted small fw-bold text-uppercase mb-1">Total Events 2025</div>
-                                <h3 class="fw-bold mb-0 text-dark">${totalEvents2025}</h3>
+                                <p class="text-muted small fw-bold text-uppercase mb-1">Total Events ${currentYear}</p>
+                                <h3 class="fw-bold mb-0 text-dark">${totalEventsThisYear != null ? totalEventsThisYear : '0'}</h3>
                             </div>
-                            <div class="icon text-danger bg-danger bg-opacity-10 rounded p-2" style="font-size: 1.2rem;">
-                                <i class="fas fa-calendar-check"></i>
+                            <div class="icon-box text-danger bg-danger bg-opacity-10">
+                                <i class="fas fa-chart-line"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-lg-8 mb-4">
-                    <h4 class="fw-bold mb-4">Recent Activities</h4>
-                    <div class="card border-0 shadow-sm p-3 rounded-4">
-                        <c:choose>
-                            <c:when test="${not empty recentActivities}">
-                                <c:forEach var="activity" items="${recentActivities}">
-                                    <div class="activity-item border-bottom py-2 mb-2">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <div>
-                                                <strong class="text-primary">${activity.action}</strong><br>
-                                                <span class="text-secondary small">${activity.description}</span><br>
-                                                <span class="text-muted" style="font-size: 0.75rem;">
-                                                    <i class="fas fa-user-tag me-1"></i> ${activity.userId}
-                                                </span>
+            <div class="row g-4">
+                <div class="col-lg-7 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0">Recent Activities</h5>
+                        <a href="${pageContext.request.contextPath}/mpp/audit" class="btn btn-sm btn-light border-0 text-primary fw-bold shadow-sm">View All</a>
+                    </div>
+
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <c:choose>
+                                <c:when test="${not empty recentActivities}">
+                                    <div class="timeline">
+                                        <c:forEach var="activity" items="${recentActivities}">
+                                            <div class="timeline-item">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <strong class="text-dark">${activity.action}</strong>
+                                                    <small class="text-muted">${activity.timestamp}</small>
+                                                </div>
+                                                <p class="text-secondary mb-1 small">${activity.description}</p>
+                                                <small class="text-primary fw-semibold">
+                                                    <i class="fas fa-user-circle me-1"></i> ${activity.userId}
+                                                </small>
                                             </div>
-                                            <small class="text-muted text-end" style="min-width: 120px;">
-                                                ${activity.timestamp}
-                                            </small>
-                                        </div>
+                                        </c:forEach>
                                     </div>
-                                </c:forEach>
-                                <div class="text-center mt-2">
-                                    <a href="${pageContext.request.contextPath}/mpp/audit" class="text-decoration-none small fw-bold">View Full History &rarr;</a>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <div class="text-center py-4 text-muted">
-                                    <i class="fas fa-history fa-2x mb-2 opacity-25"></i><br>
-                                    No recent activities recorded.
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="text-center py-5 text-muted">
+                                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                            <i class="fas fa-history fs-4 text-secondary opacity-50"></i>
+                                        </div>
+                                        <p class="mb-0">No recent activities recorded.</p>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-lg-4 mb-4">
-                    <h4 class="fw-bold mb-4">Upcoming Events</h4>
-                    <div class="event-box">
+                <div class="col-lg-5 mb-4">
+                    <h5 class="fw-bold mb-4">Upcoming Events</h5>
+
+                    <div class="card border-0 bg-transparent">
                         <c:choose>
                             <c:when test="${not empty upcomingEvents}">
                                 <c:forEach var="event" items="${upcomingEvents}">
-                                    <div class="event-card">
-                                        <h6 class="fw-bold">${event.title}</h6>
-                                        <small class="text-muted">${event.clubName}</small>
-                                        <div class="mt-2">
-                                            <i class="far fa-calendar me-2"></i>
-                                            <fmt:formatDate value="${event.date}" pattern="dd MMMM yyyy" />
-                                        </div>
-                                        <div class="mt-1">
-                                            <i class="fas fa-map-marker-alt me-2"></i>
-                                            ${event.venue != null ? event.venue : 'Venue TBC'}
+                                    <div class="card border-0 shadow-sm rounded-4 mb-3 transition-hover">
+                                        <div class="card-body p-3 d-flex align-items-center">
+                                            <div class="date-badge me-3">
+                                                <span class="d-block fw-bolder fs-5 text-primary"><fmt:formatDate value="${event.date}" pattern="dd" /></span>
+                                                <span class="d-block small fw-bold text-muted text-uppercase"><fmt:formatDate value="${event.date}" pattern="MMM" /></span>
+                                            </div>
+
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-dark">${event.title}</h6>
+                                                <p class="text-secondary small mb-1">
+                                                    <i class="fas fa-users text-muted me-1"></i> ${event.clubName}
+                                                </p>
+                                                <p class="text-muted small mb-0">
+                                                    <i class="fas fa-map-marker-alt text-danger opacity-75 me-1"></i> 
+                                                    ${event.venue != null ? event.venue : 'Venue TBC'}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
-                                <div class="text-muted p-4 text-center">
-                                    No upcoming events scheduled.
+                                <div class="card border-0 shadow-sm rounded-4">
+                                    <div class="card-body text-center py-5 text-muted">
+                                        <i class="far fa-calendar-times fs-2 mb-3 opacity-25"></i>
+                                        <p class="mb-0">No upcoming events scheduled.</p>
+                                    </div>
                                 </div>
                             </c:otherwise>
                         </c:choose>
@@ -209,6 +279,5 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
     </body>
 </html>

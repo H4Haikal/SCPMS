@@ -1,0 +1,28 @@
+Here is the exact checklist to follow whenever you update your app:
+
+1. Update and Test Locally FirstKeep your database configuration pointed to localhost (pp. 7, 37).
+Write your new code features, design changes, or fixes inside NetBeans.
+Run and test everything locally on your machine to ensure there are no bugs (pp. 23, 33).
+
+2. Switch Parameters and Rebuild
+Once you are happy with the updates and ready to push them live:
+Switch your database credentials (URL, username, password) back to the Cursor_ server settings (pp. 7, 37).
+Right-click your project root in NetBeans and select Clean and Build (p. 7).
+Go to your project's dist/ folder and grab the newly generated scpms.war file (p. 8).
+Rename it to your matric number again (e.g., s12345.war) (pp. 8, 35).
+
+3. Replace the Old File on the Server
+You do not need to delete anything manually; the server will automatically overwrite your old code:
+Log into the Cursor_ User Panel and open the File Manager (pp. 12-13).
+Make sure you are standing in the root directory / (p. 13).
+Click Upload and drop your updated matric-number .war file (pp. 13-14).
+Click Close when it finishes (p. 15). 
+
+The Tomcat server will automatically detect the new file, undeploy your old version, and unpack your new features within a few seconds.
+
+⚠️ What about the Database?
+If you only changed Java/HTML/JSP code: 
+You only need to upload the new .war file. Do not touch phpMyAdmin (pp. 8, 11).I
+
+f you added new tables or columns locally: 
+You must go to your local phpMyAdmin, export the database to a .sql file, log into the Cursor_ phpMyAdmin, select your database, and Import it so the server tables match your new code layout (pp. 9-10, 19).

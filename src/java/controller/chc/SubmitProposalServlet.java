@@ -99,7 +99,15 @@ public class SubmitProposalServlet extends HttpServlet {
             p.setParticipantPublic(parseIntSafe(request.getParameter("participantPublic")));
             p.setEstimateParticipant(parseIntSafe(request.getParameter("estimateParticipant")));
             p.setEstimateBudget(parseDoubleSafe(request.getParameter("estimateBudget")));
-            p.setBudgetDetails(request.getParameter("budgetDetails"));
+
+            // Inside your Add/Save Proposal Controller (Before inserting into DB):
+            double yuran = Double.parseDouble(request.getParameter("budgetYuran"));
+            double ptj = Double.parseDouble(request.getParameter("budgetPtj"));
+            double luar = Double.parseDouble(request.getParameter("budgetLuar"));
+
+// Flatten into a clean parsable string: "Yuran_Val ||| Ptj_Val ||| Luar_Val"
+            String compoundBudgetDetails = yuran + "|||" + ptj + "|||" + luar;
+            p.setBudgetDetails(compoundBudgetDetails);
 
             // CATCH THE YES/NO CLUB FUNDING VALUE
             String isClubFundedStr = request.getParameter("isClubFunded");
@@ -132,12 +140,10 @@ public class SubmitProposalServlet extends HttpServlet {
                 String aiSuggestion = aiEngine.generateAIAssessment(realClubId, proposedDateStr, p.getDuration(), p.getEstimateParticipant(), p.getEstimateBudget(), p.getBudgetDetails(), p.isClubFunded());
                 p.setAiSuggestion(aiSuggestion);
 
-                
             } else {
                 p.setConflictScore(0);
                 p.setAiSuggestion("");
             }
-            
 
             // =================================================================================
             // 2. EXTRACT 3NF ARRAYS AND POPULATE LISTS

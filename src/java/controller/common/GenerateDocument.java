@@ -1,9 +1,12 @@
 package controller.common;
 
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -25,7 +28,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "GenerateDocument", urlPatterns = {"/GenerateDocument"})
+@WebServlet(name = "GenerateDocument", urlPatterns = {"/GenerateDocument2"})
 public class GenerateDocument extends HttpServlet {
 
     @Override
@@ -40,7 +43,6 @@ public class GenerateDocument extends HttpServlet {
         int proposalId = Integer.parseInt(idParam);
 
         ProposalDAO dao = new ProposalDAO();
-        // Fetch the 3NF EventItem
         EventItem p = dao.getProposalById3NF(proposalId);
 
         if (p == null) {
@@ -52,247 +54,259 @@ public class GenerateDocument extends HttpServlet {
         response.setHeader("Content-Disposition", "inline; filename=WorkingPaper_" + proposalId + ".pdf");
 
         try (OutputStream out = response.getOutputStream()) {
-            Document document = new Document();
-            PdfWriter.getInstance(document, out);
+
+            // 1. Setup exact margins: Left=2.5cm (70.875pt), Right/Top/Bottom=2cm (56.7pt)
+            float leftMargin = 2.5f * 28.35f;
+            float rightMargin = 2.0f * 28.35f;
+            float topMargin = 2.0f * 28.35f;
+            float bottomMargin = 2.0f * 28.35f;
+
+            Document document = new Document(PageSize.A4, leftMargin, rightMargin, topMargin, bottomMargin);
+            PdfWriter writer = PdfWriter.getInstance(document, out);
+
+            // 2. Register and configure Tahoma fonts
+            FontFactory.registerDirectories();
+            Font fontBase = FontFactory.getFont("Tahoma");
+            if (fontBase.getBaseFont() == null) {
+                // Fallback to Helvetica if server OS doesn't have Tahoma installed
+                fontBase = FontFactory.getFont(FontFactory.HELVETICA);
+            }
+
+            Font headerFont = new Font(fontBase.getBaseFont(), 12, Font.BOLD);
+            Font italicFont = new Font(fontBase.getBaseFont(), 12, Font.ITALIC);
+            Font normalFont = new Font(fontBase.getBaseFont(), 12, Font.NORMAL);
+            Font boldFont = new Font(fontBase.getBaseFont(), 12, Font.BOLD);
+
+            // 3. Attach the Watermark event layer
+            writer.setPageEvent(new WatermarkPageEvent(boldFont));
+
             document.open();
-
-            Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
-            Font titleFont = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD);
-            Font normalFont = new Font(Font.FontFamily.HELVETICA, 11, Font.NORMAL);
-            Font boldFont = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy");
 
             // ==========================================
-            // FRONT COVER
+            // COVER PAGE
             // ==========================================
+            // Logos header (Top Section)
+            PdfPTable logoTable = new PdfPTable(1);
+            logoTable.setWidthPercentage(100);
             try {
                 String logoPath = getServletContext().getRealPath("/images/Logo_Rasmi_UMT.png");
                 Image logo = Image.getInstance(logoPath);
-                logo.scaleToFit(120f, 120f);
-                logo.setAlignment(Element.ALIGN_CENTER);
-                document.add(logo);
+                logo.scaleToFit(140f, 140f);
+                PdfPCell logoCell = new PdfPCell(logo);
+                logoCell.setBorder(PdfPCell.NO_BORDER);
+                logoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                logoTable.addCell(logoCell);
             } catch (Exception e) {
-                System.out.println("Logo error: " + e.getMessage());
+                System.out.println("Header logo load failure: " + e.getMessage());
             }
+            document.add(logoTable);
 
-            Paragraph coverText = new Paragraph();
-            coverText.setAlignment(Element.ALIGN_CENTER);
-            coverText.add(new Phrase("\nUNIVERSITI MALAYSIA TERENGGANU\nUMT\n\n", headerFont));
+            // Cover Titles Block
+            Paragraph cvText = new Paragraph();
+            cvText.setLeading(18f); // 1.5 line spacing for Font 12
+            cvText.setAlignment(Element.ALIGN_CENTER);
+            cvText.add(new Phrase("\nUNIVERSITI MALAYSIA TERENGGANU\n", headerFont));
 
             String clubName = (p.getClubName() != null) ? p.getClubName().toUpperCase() : "";
-            coverText.add(new Phrase(clubName + "\n", headerFont));
-            coverText.add(new Phrase("2025/2026\n\n\n", headerFont));
-            coverText.add(new Phrase("WORKING PAPER\n\n\n", titleFont));
+            cvText.add(new Phrase(clubName + "\n\n", headerFont));
+            cvText.add(new Phrase("KERTAS KERJA\n", headerFont));
 
             String title = (p.getTitle() != null) ? p.getTitle().toUpperCase() : "";
-            coverText.add(new Phrase(title + "\n\n\n", titleFont));
-            document.add(coverText);
+            cvText.add(new Phrase("PROGRAM " + title + "\n", headerFont));
+            cvText.add(new Phrase("SESI 2025/2026\n\n\n\n", headerFont));
+            document.add(cvText);
 
-            PdfPTable infoTable = new PdfPTable(new float[]{1, 2});
-            infoTable.setWidthPercentage(80);
-            infoTable.setHorizontalAlignment(Element.ALIGN_CENTER);
+            // Cover Meta Info Table
+            PdfPTable infoTable = new PdfPTable(new float[]{2f, 5f});
+            infoTable.setWidthPercentage(100);
 
-            String dateStr = p.getProposedDate() != null ? sdf.format(p.getProposedDate()) : "";
+            String dateStr = p.getProposedDate() != null ? sdf.format(p.getProposedDate()).toUpperCase() : "";
             String venueStr = p.getVenue() != null ? p.getVenue().toUpperCase() : "";
 
-            addCoverRow(infoTable, "DATE:", dateStr, boldFont);
-            addCoverRow(infoTable, "VENUE:", venueStr, boldFont);
-            addCoverRow(infoTable, "IN COLLABORATION WITH:", "FACULTY MANAGEMENT\nSTUDENT REPRESENTATIVE COUNCIL (MPP) UMT", boldFont);
+            addMetaRow(infoTable, "TARIKH:", dateStr, boldFont);
+            addMetaRow(infoTable, "TEMPAT:", venueStr, boldFont);
+            addMetaRow(infoTable, "DENGAN KERJASAMA:", "HAL EHWAL PELAJAR DAN ALUMNI (HEPA)\nMAJLIS PERWAKILAN PELAJAR (MPP) UMT\nDAN JAWATANKUASA KELULUSAN DAN PEMANTAUAN PROGRAM MAHASISWA (JKPM)", boldFont);
             document.add(infoTable);
 
+            // Move past cover page boundary
             document.newPage();
 
             // ==========================================
-            // CONTENT
+            // DOCUMENT CORE CONTENT
             // ==========================================
-            int counter = 1;
+            // 1.1 Category Title (Must be uppercase, bold, size 12)
+            Paragraph section1 = new Paragraph("KERTAS UNTUK PERTIMBANGAN", headerFont);
+            section1.setSpacingAfter(10f);
+            document.add(section1);
 
-            addHeading(document, "PURPOSE", headerFont);
-            counter = addParagraph(document, "This working paper is prepared to obtain consideration from the Student Affairs and Alumni Committee (HEPA), Universiti Malaysia Terengganu (UMT), to organize the program " + p.getTitle() + ".", normalFont, counter);
+            // 1.2 Title Subheading (Underlined, Title-case mixed)
+            Font underlineBold = new Font(fontBase.getBaseFont(), 12, Font.BOLD | Font.UNDERLINE);
+            Paragraph titlePara = new Paragraph("Cadangan Penganjuran " + p.getTitle(), underlineBold);
+            titlePara.setSpacingAfter(15f);
+            document.add(titlePara);
 
-            addHeading(document, "BACKGROUND", headerFont);
-            counter = addParagraph(document, p.getDescription(), normalFont, counter);
+            int paragraphNum = 1;
 
-            addHeading(document, "PROGRAM OBJECTIVES", headerFont);
-            counter = addParagraph(document, p.getObjective(), normalFont, counter);
+            // 1.3 Tujuan
+            addHeading(document, "Tujuan", headerFont);
+            addParagraph(document, "Kertas kerja ini bertujuan untuk mendapatkan pertimbangan dan kelulusan Mesyuarat Jawatankuasa Kelulusan dan Pemantauan Program Mahasiswa (JKPM) mengenai cadangan penganjuran " + p.getTitle() + ".", normalFont, paragraphNum++);
 
-            addHeading(document, "IMPACT ON SUSTAINABLE DEVELOPMENT GOALS (SDG)", headerFont);
-            counter = addParagraph(document, p.getSdgImpact() + "\n" + p.getSdgReason(), normalFont, counter);
+            // 1.4 Latar Belakang
+            addHeading(document, "Latar Belakang", headerFont);
+            addParagraph(document, p.getDescription(), normalFont, paragraphNum++);
 
-            // Using 3NF Table Builders
-            addHeading(document, counter++ + ". PROGRAM IMPLEMENTATION & TENTATIVE", headerFont);
+            // 1.5 Objektif Program
+            addHeading(document, "Objektif Program", headerFont);
+            addParagraph(document, p.getObjective(), normalFont, paragraphNum++);
+
+            // Add SDG context required implicitly by formatting rules
+            addParagraph(document, "Program ini menepati Sustainable Development Goals (SDGs) impak: " + p.getSdgImpact() + " atas faktor " + p.getSdgReason(), italicFont, paragraphNum++);
+
+            // 1.6 Maklumat Program
+            addHeading(document, "Maklumat Program", headerFont);
+            String infoPayload = "Maklumat perincian pengelolaan program dijadualkan seperti ketentuan di bawah:";
+            addParagraph(document, infoPayload, normalFont, paragraphNum++);
+
             buildTentativeTable(document, p.getItineraries(), normalFont, boldFont);
 
-            addHeading(document, counter++ + ". ORGANIZING COMMITTEE", headerFont);
-            buildCommitteeTable(document, p.getCommittees(), normalFont, boldFont);
+            // 1.7 Implikasi Kewangan
+            addHeading(document, "Implikasi Kewangan", headerFont);
+            addParagraph(document, "Pelaksanaan program ini akan memberikan implikasi kewangan keseluruhan yang dianggarkan berjumlah RM " + String.format("%.2f", p.getEstimateBudget()) + ".", normalFont, paragraphNum++);
 
-            addHeading(document, counter++ + ". FINANCIAL IMPLICATIONS", headerFont);
             buildFinancialTable(document, p.getBudgets(), p.getEstimateBudget(), normalFont, boldFont);
 
-            addHeading(document, counter + ". CONCLUSION & RECOMMENDATION", headerFont);
-            addParagraph(document, "It is hoped that this program will be executed as planned to achieve the club's goals and UMT's objectives. The committee is respectfully requested to review and subsequently endorse this working paper.", normalFont, counter);
+            // 1.8 Syor / Kelulusan
+            addHeading(document, "Syor", headerFont);
+            String syorText = "Justeru, Mesyuarat Jawatankuasa Kelulusan dan Pemantauan Program Mahasiswa (JKPM) adalah dimohon untuk mempertimbangkan serta meluluskan kertas kerja cadangan penganjuran " + p.getTitle() + " dengan implikasi kewangan yang dinyatakan.";
+            addParagraph(document, syorText, normalFont, paragraphNum);
 
             // ==========================================
-            // SIGNATURE BLOCK
+            // DOKUMEN CLOSING / SIGN-OFF BLOCK
             // ==========================================
-            document.newPage();
-            String student = (p.getCreatedBy() != null) ? p.getCreatedBy().toUpperCase() : "STUDENT REPRESENTATIVE";
+            Paragraph signOff = new Paragraph();
+            signOff.setLeading(12f); // Line spacing 1.0 for sign-off block
+            signOff.setSpacingBefore(35f);
+            signOff.add(new Phrase("Disediakan oleh: -\n\n\n\n", boldFont));
 
-            PdfPTable signTable = new PdfPTable(2);
-            signTable.setWidthPercentage(100);
-            signTable.setSpacingBefore(30f);
-            signTable.addCell(createSignatureCell("Prepared by,", student, "Program Director,\nProgram " + title, normalFont));
-            signTable.addCell(createSignatureCell("Reviewed by,", "CLUB PRESIDENT", "President,\n" + clubName + ",\nUniversiti Malaysia Terengganu.", normalFont));
-            document.add(signTable);
-
-            PdfPTable signTable2 = new PdfPTable(1);
-            signTable2.setWidthPercentage(100);
-            signTable2.setSpacingBefore(30f);
-            signTable2.addCell(createSignatureCell("Verified by,", "CLUB ADVISOR", "Advisor,\n" + clubName + ",\nUniversiti Malaysia Terengganu.", normalFont));
-            document.add(signTable2);
+            String directorName = (p.getCreatedBy() != null) ? p.getCreatedBy().toUpperCase() : "PENGARAH PROGRAM";
+            signOff.add(new Phrase("(" + directorName + ")\n", boldFont));
+            signOff.add(new Phrase("Pengarah Program " + p.getTitle() + ",\n", normalFont));
+            signOff.add(new Phrase(clubName + ",\nUniversiti Malaysia Terengganu.\n", normalFont));
+            signOff.add(new Phrase("Tarikh: " + sdf.format(new java.util.Date()), normalFont));
+            document.add(signOff);
 
             document.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // --- HELPER FUNCTIONS ---
-    private void addCoverRow(PdfPTable table, String label, String value, Font font) {
-        PdfPCell c1 = new PdfPCell(new Phrase(label, font));
-        c1.setBorder(PdfPCell.NO_BORDER);
-        c1.setPaddingBottom(15f);
-        PdfPCell c2 = new PdfPCell(new Phrase(value, font));
-        c2.setBorder(PdfPCell.NO_BORDER);
-        c2.setPaddingBottom(15f);
-        table.addCell(c1);
-        table.addCell(c2);
+    // --- STRUCTURAL FORMATTING HELPERS ---
+    private void addMetaRow(PdfPTable table, String label, String value, Font font) {
+        PdfPCell cellLabel = new PdfPCell(new Phrase(label, font));
+        cellLabel.setBorder(PdfPCell.NO_BORDER);
+        cellLabel.setPaddingBottom(12f);
+
+        PdfPCell cellValue = new PdfPCell(new Phrase(value, font));
+        cellValue.setBorder(PdfPCell.NO_BORDER);
+        cellValue.setPaddingBottom(12f);
+
+        table.addCell(cellLabel);
+        table.addCell(cellValue);
     }
 
     private void addHeading(Document doc, String title, Font font) throws Exception {
         Paragraph heading = new Paragraph("\n" + title, font);
-        heading.setSpacingAfter(8f);
+        heading.setSpacingBefore(10f);
+        heading.setSpacingAfter(6f);
         doc.add(heading);
     }
 
-    private int addParagraph(Document doc, String content, Font font, int counter) throws Exception {
+    private void addParagraph(Document doc, String content, Font font, int currentId) throws Exception {
         if (content == null || content.trim().isEmpty()) {
-            return counter;
+            return;
         }
-        String[] paragraphs = content.split("\n");
-        for (String para : paragraphs) {
-            if (!para.trim().isEmpty()) {
-                Paragraph p = new Paragraph(counter + ". " + para.trim(), font);
-                p.setAlignment(Element.ALIGN_JUSTIFIED);
-                p.setSpacingAfter(8f);
-                doc.add(p);
-                counter++;
-            }
-        }
-        return counter;
+
+        Paragraph p = new Paragraph(currentId + ". " + content.trim(), font);
+        p.setLeading(18f); // Strict Line Spacing 1.5 override
+        p.setAlignment(Element.ALIGN_JUSTIFIED);
+        p.setSpacingAfter(10f);
+        doc.add(p);
     }
 
-    private PdfPCell createSignatureCell(String title, String name, String position, Font font) {
-        Paragraph p = new Paragraph(title + "\n\n\n\n\n\n(" + name + ")\n" + position, font);
-        PdfPCell cell = new PdfPCell(p);
-        cell.setBorder(PdfPCell.NO_BORDER);
-        return cell;
-    }
-
-    // ==========================================
-    // 3NF PDF TABLE BUILDERS
-    // ==========================================
     private void buildTentativeTable(Document doc, List<ProposalItinerary> itineraries, Font font, Font boldFont) throws Exception {
         if (itineraries == null || itineraries.isEmpty()) {
-            doc.add(new Paragraph("No itinerary provided.\n", font));
             return;
         }
+
         PdfPTable table = new PdfPTable(new float[]{2f, 2f, 6f});
         table.setWidthPercentage(100);
-        table.setSpacingBefore(5f);
-        table.setSpacingAfter(15f);
+        table.setSpacingBefore(8f);
+        table.setSpacingAfter(12f);
 
-        addTableHeader(table, new String[]{"DAY", "TIME", "ACTIVITY"}, boldFont);
+        addCellHeader(table, "HARI / TARIKH", boldFont);
+        addCellHeader(table, "MASA", boldFont);
+        addCellHeader(table, "AKTIVITI / ACARA", boldFont);
 
         for (ProposalItinerary i : itineraries) {
-            table.addCell(new Phrase(i.getDay() != null ? i.getDay() : "", font));
-            table.addCell(new Phrase(i.getTime() != null ? i.getTime() : "", font));
-            table.addCell(new Phrase(i.getActivity() != null ? i.getActivity() : "", font));
+            table.addCell(new PdfPCell(new Phrase(i.getDay(), font)));
+            table.addCell(new PdfPCell(new Phrase(i.getTime(), font)));
+            table.addCell(new PdfPCell(new Phrase(i.getActivity(), font)));
         }
         doc.add(table);
     }
 
-    private void buildCommitteeTable(Document doc, List<ProposalCommittee> committees, Font font, Font boldFont) throws Exception {
-        if (committees == null || committees.isEmpty()) {
-            doc.add(new Paragraph("No committee provided.\n", font));
-            return;
-        }
-        PdfPTable table = new PdfPTable(new float[]{2.5f, 4.5f, 3f});
-        table.setWidthPercentage(100);
-        table.setSpacingBefore(5f);
-        table.setSpacingAfter(15f);
-
-        addTableHeader(table, new String[]{"MATRIC NO.", "FULL NAME", "ROLE / POSITION"}, boldFont);
-
-        for (ProposalCommittee c : committees) {
-            table.addCell(new Phrase(c.getMatricNo() != null ? c.getMatricNo() : "", font));
-            table.addCell(new Phrase(c.getName() != null ? c.getName() : "", font));
-            table.addCell(new Phrase(c.getRole() != null ? c.getRole() : "", font));
-        }
-        doc.add(table);
-    }
-
-    private void buildFinancialTable(Document doc, List<ProposalBudget> budgets, double grandTotal, Font font, Font boldFont) throws Exception {
+    private void buildFinancialTable(Document doc, List<ProposalBudget> budgets, double totalSum, Font font, Font boldFont) throws Exception {
         if (budgets == null || budgets.isEmpty()) {
-            doc.add(new Paragraph("No financial details provided.\n", font));
             return;
         }
-        PdfPTable table = new PdfPTable(new float[]{4.5f, 1.5f, 2f, 2f});
-        table.setWidthPercentage(100);
-        table.setSpacingBefore(5f);
-        table.setSpacingAfter(15f);
 
-        addTableHeader(table, new String[]{"ITEM / DESCRIPTION", "QTY", "UNIT PRICE (RM)", "TOTAL (RM)"}, boldFont);
+        PdfPTable table = new PdfPTable(new float[]{5f, 1.5f, 2f, 2.5f});
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(8f);
+        table.setSpacingAfter(12f);
+
+        addCellHeader(table, "PERKARA / PERINCIAN", boldFont);
+        addCellHeader(table, "KUANTITI", boldFont);
+        addCellHeader(table, "HARGA SEUNIT (RM)", boldFont);
+        addCellHeader(table, "JUMLAH (RM)", boldFont);
 
         for (ProposalBudget b : budgets) {
-            table.addCell(new Phrase(b.getItemName() != null ? b.getItemName() : "", font));
+            table.addCell(new PdfPCell(new Phrase(b.getItemName(), font)));
 
-            PdfPCell qtyCell = new PdfPCell(new Phrase(String.valueOf(b.getQuantity()), font));
-            qtyCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            table.addCell(qtyCell);
+            PdfPCell qty = new PdfPCell(new Phrase(String.valueOf(b.getQuantity()), font));
+            qty.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(qty);
 
-            PdfPCell priceCell = new PdfPCell(new Phrase(String.format("%.2f", b.getUnitPrice()), font));
-            priceCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            table.addCell(priceCell);
+            PdfPCell price = new PdfPCell(new Phrase(String.format("%.2f", b.getUnitPrice()), font));
+            price.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(price);
 
-            PdfPCell totalCell = new PdfPCell(new Phrase(String.format("%.2f", b.getTotalPrice()), font));
-            totalCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            table.addCell(totalCell);
+            PdfPCell subtotal = new PdfPCell(new Phrase(String.format("%.2f", b.getTotalPrice()), font));
+            subtotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            table.addCell(subtotal);
         }
 
-        // Add Grand Total Row
-        PdfPCell cellLabel = new PdfPCell(new Phrase("GRAND TOTAL (RM)", boldFont));
-        cellLabel.setColspan(3);
-        cellLabel.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        cellLabel.setBackgroundColor(new com.itextpdf.text.BaseColor(240, 240, 240));
-        table.addCell(cellLabel);
+        PdfPCell totalLabel = new PdfPCell(new Phrase("JUMLAH KESELURUHAN PERBELANJAAN (RM)", boldFont));
+        totalLabel.setColspan(3);
+        totalLabel.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        totalLabel.setBackgroundColor(new BaseColor(245, 245, 245));
+        table.addCell(totalLabel);
 
-        PdfPCell cellTotal = new PdfPCell(new Phrase(String.format("%.2f", grandTotal), boldFont));
-        cellTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        cellTotal.setBackgroundColor(new com.itextpdf.text.BaseColor(240, 240, 240));
-        table.addCell(cellTotal);
+        PdfPCell totalVal = new PdfPCell(new Phrase(String.format("%.2f", totalSum), boldFont));
+        totalVal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        totalVal.setBackgroundColor(new BaseColor(245, 245, 245));
+        table.addCell(totalVal);
 
         doc.add(table);
     }
 
-    private void addTableHeader(PdfPTable table, String[] headers, Font font) {
-        for (String header : headers) {
-            PdfPCell cell = new PdfPCell(new Phrase(header, font));
-            cell.setBackgroundColor(new com.itextpdf.text.BaseColor(230, 230, 230));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            cell.setPaddingBottom(5f);
-            table.addCell(cell);
-        }
+    private void addCellHeader(PdfPTable table, String name, Font font) {
+        PdfPCell headerCell = new PdfPCell(new Phrase(name, font));
+        headerCell.setBackgroundColor(new BaseColor(230, 230, 230));
+        headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        headerCell.setPadding(6f);
+        table.addCell(headerCell);
     }
 }
