@@ -3,9 +3,28 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/common/NotificationServlet.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/web/WEB-INF/jsp/faculty/FacultyReview.jsp</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/advisor/AdvisorDashboardServlet.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/advisor/AdvisorPendingServlet.java</file>
             <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/util/Config.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/faculty/FacultyReviewServlet.java</file>
             <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/nbproject/build-impl.xml</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/faculty/FacultyServlet.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/faculty/FacultyAllProposalsServlet.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/web/WEB-INF/jsp/faculty/FacultyDashboard.jsp</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/advisor/UploadERiskServlet.java</file>
             <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/util/DBConnection.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/util/ProposalTracker.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/chc/SubmitProposalServlet.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/web/WEB-INF/jsp/chc/UploadAGM.jsp</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/mpp/ReviewProposalServlet.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/web/WEB-INF/jsp/chc/CHCDocumentation.jsp</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/advisor/AdvisorReviewServlet.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/nbproject/project.properties</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/controller/hepa/HEPADashboardServlet.java</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/web/WEB-INF/jsp/chc/ClubProfile.jsp</file>
+            <file>file:/C:/Users/User/OneDrive/Desktop/Semester%206/SCPMS/src/java/dao/NotificationDAO.java</file>
         </group>
     </open-files>
 </project-private>

@@ -41,18 +41,24 @@ public class UploadMPPMinutesServlet extends HttpServlet {
             String safeFileName = originalFileName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
             String fileName = "PROPOSAL_" + proposalId + "_MINUTES_" + safeFileName;
 
-            // Define upload folder inside 'uploads/mpp_minutes'
-            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator + "mpp_minutes";
+            // --- THE CURSOR_ SERVER FIX FOR MPP MINUTES ---
+            String userHome = System.getProperty("user.home");
+
+// Maps to the server's "uploads/mpp_minutes" directory
+            String uploadPath = userHome + File.separator + "uploads" + File.separator + "mpp_minutes";
+
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
             }
 
-            // Save the file to the server
-            filePart.write(uploadPath + File.separator + fileName);
+// Write the file to disk
+            String savePath = uploadPath + File.separator + fileName;
+            filePart.write(savePath);
 
-            // Update database
+// The path you save to the database should look like this:
             String dbPath = "uploads/mpp_minutes/" + fileName;
+
             ProposalDAO dao = new ProposalDAO();
             boolean success = dao.updateMPPMinutesFilePath(proposalId, dbPath);
 

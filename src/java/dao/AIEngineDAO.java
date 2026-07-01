@@ -282,11 +282,18 @@ public class AIEngineDAO {
         try {
             String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + geminiKey;
 
-            // Updated payload: Escapes the prompt safely and adds generationConfig to turn off thinking
+            // =========================================================================
+// REPLACE ONLY THE OLD geminiPayload ASSIGNMENT LINES WITH THIS STRUCTURE:
+// =========================================================================
             String safePrompt = prompt.replace("\\", "\\\\").replace("\"", "\\\"");
+
             String geminiPayload = "{"
                     + "\"contents\": [{\"parts\": [{\"text\": \"" + safePrompt + "\"}]}], "
-                    + "\"generationConfig\": {\"thinkingConfig\": {\"thinkingBudget\": 0}}"
+                    + "\"generationConfig\": {"
+                    + "    \"thinkingConfig\": {\"thinkingBudget\": 0},"
+                    + "    \"maxOutputTokens\": 150," // <-- FORCES GEMINI TO RESPOND CONCISELY (~100 WORDS MAX)
+                    + "    \"temperature\": 0.3" // <-- LOWER TEMPERATURE SPEEDS UP PROCESSING FOR THE EXHIBITION
+                    + "  }"
                     + "}";
 
             java.net.HttpURLConnection conn = (java.net.HttpURLConnection) new java.net.URL(geminiUrl).openConnection();

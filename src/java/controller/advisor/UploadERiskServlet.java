@@ -42,22 +42,25 @@ public class UploadERiskServlet extends HttpServlet {
             String safeFileName = originalFileName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
             String fileName = "PROPOSAL_" + proposalId + "_ERISK_" + safeFileName;
 
-            // Setup folder "uploads/erisk" dalam server
-            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator + "erisk";
+            // --- THE CURSOR_ SERVER FIX ---
+            String userHome = System.getProperty("user.home");
+
+            // This maps exactly to the "uploads" folder provided by the admin, plus an "erisk" subfolder
+            String uploadPath = userHome + File.separator + "uploads" + File.separator + "erisk";
+
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs(); // Buat folder kalau belum wujud
             }
 
-            // Tulis/Save fail ke dalam folder server
+            // Tulis/Save fail ke dalam folder server secara kekal
             String savePath = uploadPath + File.separator + fileName;
             filePart.write(savePath);
 
-            // Simpan path relatif ke dalam database
+            // Simpan path relatif ke dalam database supaya mudah dipanggil di JSP nanti
             String dbPath = "uploads/erisk/" + fileName;
             ProposalDAO dao = new ProposalDAO();
             boolean success = dao.updateERiskFilePath(proposalId, dbPath);
-
             if (success) {
                 session.setAttribute("successMessage", "E-Risk Document uploaded successfully!");
             } else {

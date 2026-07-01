@@ -23,6 +23,9 @@ import model.User;
 )
 public class HEPADocumentManagerServlet extends HttpServlet {
 
+    // Define the persistent root folder from CURSOR_ admin
+    private final String UPLOAD_ROOT = System.getProperty("user.home") + File.separator + "uploads";
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -48,18 +51,19 @@ public class HEPADocumentManagerServlet extends HttpServlet {
         ProposalDAO dao = new ProposalDAO();
 
         // ==========================================
-        // ACTION: DELETE DOCUMENT
+        // ACTION: DELETE DOCUMENT 
         // ==========================================
         if ("delete".equals(action)) {
             int docId = Integer.parseInt(request.getParameter("docId"));
 
-            // 1. Get the path to physically delete the file from the server
-            String filePath = dao.getSystemDocumentPath(docId);
-            if (filePath != null) {
-                String fullPath = getServletContext().getRealPath("") + File.separator + filePath.replace("/", File.separator);
+            // 1. Get path from DB and delete physical file from persistent folder
+            String dbPath = dao.getSystemDocumentPath(docId); // e.g., "uploads/documents/filename.pdf"
+            if (dbPath != null) {
+                // Construct absolute path using our persistent UPLOAD_ROOT
+                String fullPath = UPLOAD_ROOT + File.separator + dbPath.replace("uploads/", "");
                 File fileToDelete = new File(fullPath);
                 if (fileToDelete.exists()) {
-                    fileToDelete.delete(); // Delete physical file
+                    fileToDelete.delete();
                 }
             }
 
@@ -83,7 +87,8 @@ public class HEPADocumentManagerServlet extends HttpServlet {
         String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
         fileName = System.currentTimeMillis() + "_" + fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
 
-        String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator + "documents";
+        // Target persistent directory: /home/user/uploads/documents/
+        String uploadPath = UPLOAD_ROOT + File.separator + "documents";
         File uploadDir = new File(uploadPath);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
@@ -92,19 +97,17 @@ public class HEPADocumentManagerServlet extends HttpServlet {
         String savePath = uploadPath + File.separator + fileName;
         filePart.write(savePath);
 
+        // Store path in DB relative to the uploads folder as expected by your system
         String dbFilePath = "uploads/documents/" + fileName;
 
-        // --- NEW: Calculate File Size ---
         long sizeInBytes = filePart.getSize();
         String fileSizeStr = (sizeInBytes / 1024) + " KB";
         if (sizeInBytes > 1024 * 1024) {
             fileSizeStr = String.format("%.2f MB", (double) sizeInBytes / (1024 * 1024));
         }
 
-        // --- NEW: Determine File Type ---
         String fileType = fileName.toLowerCase().endsWith(".pdf") ? "pdf" : "word";
 
-        // Pass all 6 parameters into the DAO
         dao.insertSystemDocument(finalCategory, title, dbFilePath, "HEPA Admin", fileSizeStr, fileType);
 
         request.getSession().setAttribute("successMsg", "Document uploaded successfully under '" + finalCategory + "'!");

@@ -189,20 +189,28 @@
                                 <div class="row mb-4 g-2">
                                     <div class="col-md-3">
                                         <small class="text-muted d-block mb-1">UMT Students</small>
-                                        <input type="number" name="participantUmt" id="partUmt" class="form-control bg-light border-0" min="0" placeholder="0" value="${draft.participantUmt}" required>
+                                        <input type="number" name="participantUmt" id="partUmt"
+                                               class="form-control bg-light border-0" min="0" placeholder="0" 
+                                               value="${not empty draft.participantUmt ? draft.participantUmt : 0}" required>
                                     </div>
                                     <div class="col-md-3">
                                         <small class="text-muted d-block mb-1">UMT Staff</small>
-                                        <input type="number" name="participantStaff" id="partStaff" class="form-control bg-light border-0" min="0" placeholder="0" value="${draft.participantStaff}" required>
+                                        <input type="number" name="participantStaff" id="partStaff"
+                                               class="form-control bg-light border-0" min="0" placeholder="0" 
+                                               value="${not empty draft.participantStaff ? draft.participantStaff : 0}" required>
                                     </div>
                                     <div class="col-md-3">
                                         <small class="text-muted d-block mb-1">Public / Others</small>
-                                        <input type="number" name="participantPublic" id="partPublic" class="form-control bg-light border-0" min="0" placeholder="0" value="${draft.participantPublic}" required>
+                                        <input type="number" name="participantPublic" id="partPublic"
+                                               class="form-control bg-light border-0" min="0" placeholder="0" 
+                                               value="${not empty draft.participantPublic ? draft.participantPublic : 0}" required>
                                         <input type="text" name="participantOtherDesc" class="form-control form-control-sm bg-white border mt-1" placeholder="Specify (e.g. High schoolers)" value="${draft.participantOtherDesc}">
                                     </div>
                                     <div class="col-md-3">
                                         <small class="fw-bold text-primary d-block mb-1">Total</small>
-                                        <input type="number" name="estimateParticipant" id="totalPart" class="form-control bg-primary-subtle text-primary border-0 fw-bold" placeholder="0" value="${draft.estimateParticipant}" readonly required>
+                                        <input type="number" name="estimateParticipant" id="totalPart"
+                                               class="form-control bg-primary-subtle text-primary border-0 fw-bold" placeholder="0"
+                                               value="${not empty draft.estimateParticipant ? draft.estimateParticipant : 0}" readonly required>
                                     </div>
                                 </div>
 
@@ -488,10 +496,15 @@
                                             </div>
 
                                             <div id="ai-realtime-result" class="mt-3">
-                                                <div class="text-center p-4">
-                                                    <i class="fas fa-keyboard fa-3x text-light mb-3"></i>
-                                                    <p class='text-muted small mb-0'>Please fill in the <b>Date, Duration, Participants,</b> and <b>Budget</b> in the form to start the smart analysis.</p>
-                                                </div>
+                                                <!--                                                <div class="text-center p-4">
+                                                                                                    <i class="fas fa-keyboard fa-3x text-light mb-3"></i>
+                                                                                                    <p class='text-muted small mb-0'>Please fill in the <b>Date, Duration, Participants,</b> and <b>Budget</b> in the form to start the smart analysis.</p>
+                                                                                                </div>-->
+                                                <!-- Put this inside your card-body right above the ai-realtime-result container -->
+                                                <button type="button" id="btnForceAI" class="btn btn-primary w-100 mb-3 rounded-pill fw-bold shadow-sm">
+                                                    <i class="fas fa-wand-magic-sparkles me-2"></i> Run AI Assessment
+                                                </button>
+
                                             </div>
                                         </div>
                                     </div>
@@ -555,6 +568,7 @@
                                                     const totalPart = document.getElementById('totalPart');
                                                     totalPart.value = u + s + p;
                                                     totalPart.dispatchEvent(new Event('input'));
+
                                                 }
                                                 document.getElementById('partUmt').addEventListener('input', calcParticipants);
                                                 document.getElementById('partStaff').addEventListener('input', calcParticipants);
@@ -591,64 +605,158 @@
                                                     const durationInput = document.getElementById('durationInput');
                                                     const paxInput = document.getElementById('totalPart');
                                                     const budgetInput = document.getElementById('mainBudgetInput');
-                                                    const sponsorInput = document.querySelector('textarea[name="budgetDetails"]');
+                                                    // Replace the old single sponsorInput line with these:
+                                                    const yuranInput = document.querySelector('input[name="budgetYuran"]');
+                                                    const ptjInput = document.querySelector('input[name="budgetPtj"]');
+                                                    const luarInput = document.querySelector('input[name="budgetLuar"]');
 
                                                     const resultDiv = document.getElementById("ai-realtime-result");
                                                     const iconContainer = document.getElementById("ai-icon-container");
                                                     const fabBtn = document.getElementById("fabAiBtn");
                                                     let isRiskyProposal = false;
 
+                                                    let aiDebounceTimer; // Global timer reference to manage rate limits
+
                                                     function triggerAI() {
+                                                        // 1. Clear any pending API requests from the previous keystroke immediately
+                                                        clearTimeout(aiDebounceTimer);
+
+                                                        // 2. Fetch input element objects safely
+                                                        const titleInput = document.querySelector('input[name="title"]');
+                                                        const dateInput = document.getElementById('startDate');
+                                                        const durationInput = document.getElementById('durationInput');
+                                                        const paxInput = document.getElementById('totalPart');
+                                                        const budgetInput = document.getElementById('mainBudgetInput');
+                                                        const resultDiv = document.getElementById("ai-realtime-result");
+                                                        const iconContainer = document.getElementById("ai-icon-container");
+                                                        const fabBtn = document.getElementById("fabAiBtn");
+
+                                                        // Fetch the new exhibition action button element
+                                                        const forceAiBtn = document.getElementById('btnForceAI');
+
+                                                        // 3. FIX BUG 1: Merge multi-source budget inputs into a dynamic text format
+                                                        const yuranInput = document.querySelector('input[name="budgetYuran"]');
+                                                        const ptjInput = document.querySelector('input[name="budgetPtj"]');
+                                                        const luarInput = document.querySelector('input[name="budgetLuar"]');
+
+                                                        let sponsorText = "";
+                                                        if (parseFloat(yuranInput?.value) > 0)
+                                                            sponsorText += "yuran ";
+                                                        if (parseFloat(ptjInput?.value) > 0)
+                                                            sponsorText += "sumbangan ptj ";
+                                                        if (parseFloat(luarInput?.value) > 0)
+                                                            sponsorText += "tajaan luar sponsor ";
+
+                                                        // 4. Gather string values and sanitize URI characters
                                                         const title = titleInput ? encodeURIComponent(titleInput.value) : 'Untitled Program';
                                                         const date = dateInput ? dateInput.value : '';
                                                         const duration = durationInput ? durationInput.value : '';
-                                                        const pax = paxInput ? paxInput.value : '';
-                                                        const budget = budgetInput ? budgetInput.value : '';
-                                                        const sponsor = sponsorInput ? encodeURIComponent(sponsorInput.value) : '';
+                                                        const pax = paxInput ? paxInput.value : '0';
+                                                        const budget = budgetInput ? budgetInput.value : '0.00';
+                                                        const sponsor = encodeURIComponent(sponsorText.trim());
 
                                                         const isFundedChecked = document.querySelector('input[name="isClubFunded"]:checked');
                                                         const isClubFunded = isFundedChecked ? isFundedChecked.value : 'true';
 
-                                                        if (date && duration && pax && budget && budget > 0) {
-                                                            resultDiv.innerHTML = '<div class="d-flex align-items-center py-4"><div class="spinner-border text-primary me-3" role="status"></div> <div><span class="text-primary fw-bold d-block">AI is Thinking...</span><small class="text-muted">Analyzing WSM matrix & Prompting LLM</small></div></div>';
+                                                        // 5. FIX BUG 2: Sanitize values to prevent early loop freezing on initial 0 states
+                                                        const parsedPax = parseInt(pax, 10) || 0;
+                                                        const parsedBudget = parseFloat(budget) || 0;
+
+                                                        if (date && duration && parsedPax >= 0 && parsedBudget > 0) {
+
+                                                            // ==========================================
+                                                            // 📍 LOCATION FOR DYNAMIC UI: START LOADING STATE
+                                                            // ==========================================
+                                                            if (forceAiBtn) {
+                                                                forceAiBtn.disabled = true;
+                                                                forceAiBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+                                                            }
+
+                                                            resultDiv.innerHTML = '<div class="d-flex align-items-center py-4">' +
+                                                                    '<div class="spinner-border text-primary me-3" role="status"></div>' +
+                                                                    '<div><span class="text-primary fw-bold d-block">AI is compiling insights...</span>' +
+                                                                    '<small class="text-muted">Analyzing layout specifications...</small></div></div>';
+
                                                             iconContainer.className = "bg-warning text-dark rounded-3 p-3 me-3 shadow-sm";
                                                             if (fabBtn)
                                                                 fabBtn.classList.add("bg-warning", "text-dark", "border-warning");
 
-                                                            fetch('${pageContext.request.contextPath}/AIEngineAPI?title=' + title + '&date=' + date + '&duration=' + duration + '&pax=' + pax + '&budget=' + budget + '&budgetDetails=' + sponsor + '&isClubFunded=' + isClubFunded)
-                                                                    .then(response => response.text())
-                                                                    .then(data => {
-                                                                        resultDiv.innerHTML = data;
-                                                                        isRiskyProposal = data.includes("BERISIKO") || data.includes("TIDAK DIGALAKKAN") || data.includes("RISKY");
-                                                                        iconContainer.className = "bg-primary text-white rounded-3 p-3 me-3 shadow-sm";
-                                                                        if (fabBtn) {
-                                                                            fabBtn.classList.remove("bg-warning", "text-dark", "border-warning");
-                                                                            fabBtn.classList.add("bg-primary", "text-white");
-                                                                        }
-                                                                    }).catch(error => {
-                                                                resultDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-wifi me-2"></i>Error contacting AI server.</div>';
-                                                                iconContainer.className = "bg-danger text-white rounded-3 p-3 me-3 shadow-sm";
-                                                                isRiskyProposal = false;
-                                                            });
+                                                            // 7. Controlled Request Queueing: Fire request
+                                                            aiDebounceTimer = setTimeout(() => {
+                                                                fetch('${pageContext.request.contextPath}/AIEngineAPI?title=' + title + '&date=' + date +
+                                                                        '&duration=' + duration + '&pax=' + pax + '&budget=' + budget + '&budgetDetails=' + sponsor +
+                                                                        '&isClubFunded=' + isClubFunded)
+                                                                        .then(response => response.text())
+                                                                        .then(data => {
+                                                                            // Display processed output data
+                                                                            resultDiv.innerHTML = data;
+
+                                                                            // Track risk evaluation state for submission blocker system
+                                                                            isRiskyProposal = data.includes("BERISIKO") || data.includes("TIDAK DIGALAKKAN") || data.includes("RISKY");
+
+                                                                            // Reset loading container icon highlights back to active defaults
+                                                                            iconContainer.className = "bg-primary text-white rounded-3 p-3 me-3 shadow-sm";
+                                                                            if (fabBtn) {
+                                                                                fabBtn.classList.remove("bg-warning", "text-dark", "border-warning");
+                                                                                fabBtn.classList.add("bg-primary", "text-white");
+                                                                            }
+
+                                                                            // ==========================================
+                                                                            // 📍 LOCATION FOR DYNAMIC UI: RESET SUCCESS STATE
+                                                                            // ==========================================
+                                                                            if (forceAiBtn) {
+                                                                                forceAiBtn.disabled = false;
+                                                                                forceAiBtn.innerHTML = '<i class="fas fa-wand-magic-sparkles me-2"></i> Run AI Assessment';
+                                                                            }
+                                                                        })
+                                                                        .catch(error => {
+                                                                            console.error("AI Thread error:", error);
+                                                                            resultDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-wifi me-2"></i>Network latency detected. Retrying...</div>';
+                                                                            iconContainer.className = "bg-danger text-white rounded-3 p-3 me-3 shadow-sm";
+
+                                                                            // ==========================================
+                                                                            // 📍 LOCATION FOR DYNAMIC UI: RESET ERROR STATE
+                                                                            // ==========================================
+                                                                            if (forceAiBtn) {
+                                                                                forceAiBtn.disabled = false;
+                                                                                forceAiBtn.innerHTML = '<i class="fas fa-wand-magic-sparkles me-2"></i> Run AI Assessment';
+                                                                            }
+                                                                        });
+                                                            }, 500); // 500ms slight buffer to ensure DOM finishes registering values
+                                                        } else {
+                                                            // Validation fallback warning inside the drawer if button clicked with an incomplete form
+                                                            resultDiv.innerHTML = '<div class="alert alert-warning border-0 small shadow-sm">' +
+                                                                    '<i class="fas fa-exclamation-circle me-2"></i><b>Missing Information:</b> Please fill out the <b>Start Date, End Date, Participants</b> and add items to the <b>Financial Table</b> before running the assessment.</div>';
                                                         }
                                                     }
 
-                                                    if (titleInput)
-                                                        titleInput.addEventListener("input", triggerAI);
 
-                                                    if (dateInput && durationInput && paxInput && budgetInput) {
-                                                        dateInput.addEventListener("change", triggerAI);
-                                                        durationInput.addEventListener("input", triggerAI);
-                                                        paxInput.addEventListener("input", triggerAI);
-                                                        budgetInput.addEventListener("change", triggerAI);
 
-                                                        if (sponsorInput)
-                                                            sponsorInput.addEventListener("input", triggerAI);
-
-                                                        document.querySelectorAll('.club-fund-radio').forEach(radio => {
-                                                            radio.addEventListener("change", triggerAI);
+//                                                    if (titleInput)
+//                                                        titleInput.addEventListener("input", triggerAI);
+//
+//                                                    if (dateInput && durationInput && paxInput && budgetInput) {
+//                                                        dateInput.addEventListener("change", triggerAI);
+//                                                        durationInput.addEventListener("input", triggerAI);
+//                                                        paxInput.addEventListener("input", triggerAI);
+//                                                        budgetInput.addEventListener("change", triggerAI);
+//
+//                                                        if (sponsorInput)
+//                                                            sponsorInput.addEventListener("input", triggerAI);
+//
+//                                                        document.querySelectorAll('.club-fund-radio').forEach(radio => {
+//                                                            radio.addEventListener("change", triggerAI);
+//                                                        });
+//                                                    }
+                                                    // THIS CLICK EVENT LISTENER FOR YOUR EXHIBITION BUTTON:
+                                                    const forceAiBtn = document.getElementById('btnForceAI');
+                                                    if (forceAiBtn) {
+                                                        forceAiBtn.addEventListener('click', function () {
+                                                            // Force an immediate execution bypassing any input debounce delays
+                                                            triggerAI();
                                                         });
                                                     }
+
 
                                                     const submitBtn = document.querySelector('button[value="submit"]');
                                                     if (submitBtn) {

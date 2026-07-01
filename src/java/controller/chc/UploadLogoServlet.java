@@ -49,21 +49,23 @@ public class UploadLogoServlet extends HttpServlet {
 
                 String fileName = "club_" + clubId + "_" + System.currentTimeMillis() + ".png";
 
-                // --- THE FIX: SAVE TO A PERMANENT FOLDER ON YOUR LAPTOP ---
-                // This creates: C:\Users\YourName\SCPMS_Uploads\Logos
+                // --- THE CURSOR_ SERVER FIX ---
                 String userHome = System.getProperty("user.home");
-                String uploadPath = userHome + File.separator + "SCPMS_Uploads" + File.separator + "Logos";
+
+                // Maps to the server's "uploads/logos" directory
+                String uploadPath = userHome + File.separator + "uploads" + File.separator + "logos";
 
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) {
-                    uploadDir.mkdirs(); // Creates the folder if it doesn't exist
+                    uploadDir.mkdirs();
                 }
 
                 // Save the file permanently
                 filePart.write(uploadPath + File.separator + fileName);
 
                 // Update Database
-                if (clubDAO.updateClubLogo(clubId, fileName)) {
+                String dbPath = "uploads/logos/" + fileName;
+                if (clubDAO.updateClubLogo(clubId, dbPath)) {
                     request.getSession().setAttribute("message", "Logo updated successfully!");
                 } else {
                     request.getSession().setAttribute("error", "Failed to update database.");
